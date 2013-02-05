@@ -18,7 +18,7 @@ import android.util.Log;
  * @author Woopra on 1/26/2013
  * 
  */
-public class WoopraPing extends Thread {
+public class WoopraPing {
 
 	public static String LOG_TAG = "WoopraPing";
 	private static final String W_PING_ENDPOINT = "http://www.woopra.com/track/ping/";
@@ -39,8 +39,7 @@ public class WoopraPing extends Thread {
 		}
 	}
 
-	@Override
-	public void run() {
+	public void ping() {
 		//
 		HttpClient pingHttpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(pingUrlBuilder.toString());
@@ -61,7 +60,6 @@ public class WoopraPing extends Thread {
 				Log.e(LOG_TAG, "Got error!", e);
 			}
 		}
-		super.run();
 	}
 
 	public void stopPing() {
