@@ -1,6 +1,8 @@
 package com.woopra;
 
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.Properties;
 
@@ -23,6 +25,7 @@ public class WoopraTracker {
 	public static String LOG_TAG = "WoopraTracker";
 	private static final String W_EVENT_ENDPOINT = "http://www.woopra.com/track/ce/";
 	private static WoopraTracker gSingleton = null;
+	private ExecutorService executor = null;
 	private String domain = null;
 	// default timeout value for Woopra service
 	private int idleTimeout = 30;
@@ -41,6 +44,7 @@ public class WoopraTracker {
 	public static WoopraTracker getInstance() {
 		if (gSingleton == null) {
 			gSingleton = new WoopraTracker();
+			gSingleton.executor = Executors.newFixedThreadPool(1);
 			gSingleton.setVisitor(WoopraVisitor.getAnonymousVisitor());
 		}
 		return gSingleton;
@@ -65,6 +69,20 @@ public class WoopraTracker {
 					"WTracker.visitor property must be set before [WTracker trackEvent:] invocation");
 			return false;
 		}
+		// stop ping
+		if (ping != null) {
+			ping.stopPing();
+		}
+		EventRunner runner = new EventRunner(event);
+		try {
+			executor.execute(runner);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean trackEventIntra(WoopraEvent event) {
 		// generate request url
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(W_EVENT_ENDPOINT).append("?host=")
@@ -98,9 +116,9 @@ public class WoopraTracker {
 			return false;
 		}
 		// reset ping
-		if (pingEnabled) {
-			resetPing(domain, getVisitor().getCookie(), idleTimeout);
-		}
+		// if (pingEnabled) {
+		// resetPing(domain, getVisitor().getCookie(), idleTimeout);
+		// }
 		return true;
 	}
 
@@ -141,7 +159,7 @@ public class WoopraTracker {
 			ping.stopPing();
 		}
 		ping = new WoopraPing(domain, cookie, idleTimeout);
-		ping.start();
+		ping.ping();
 	}
 
 	public WoopraVisitor getVisitor() {
@@ -166,5 +184,25 @@ public class WoopraTracker {
 
 	public void addVisitorProperties(Properties newProperties) {
 		getVisitor().addProperties(newProperties);
+	}
+
+	class EventRunner implements Runnable {
+		WoopraEvent event = null;
+
+		public EventRunner(WoopraEvent event) {
+			this.event = event;
+		}
+
+		@Override
+		public void run() {
+			// send track event
+			trackEventIntra(event);
+			// send ping events
+			if (pingEnabled) {
+				ping = new WoopraPing(domain, getVisitor().getCookie(),
+						idleTimeout);
+				ping.ping();
+			}
+		}
 	}
 }
