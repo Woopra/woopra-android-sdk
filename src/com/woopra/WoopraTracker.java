@@ -90,18 +90,20 @@ public class WoopraTracker {
 				.append(getVisitor().getCookie())
 				.append("&response=xml&timeout=").append(idleTimeout);
 		if (referer != null) {
-			urlBuilder.append("&referer=").append(referer);
+			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
 		//
 		// Add visitors properties
 		for (Entry<Object, Object> entry : visitor.getProperties().entrySet()) {
-			urlBuilder.append("&cv_").append(entry.getKey()).append("=")
-					.append(entry.getValue());
+			urlBuilder.append("&cv_").append(encodeUriComponent(entry.getKey()))
+					.append("=")
+					.append(encodeUriComponent(entry.getValue()));
 		}
 		// Add Event properties
 		for (Entry<Object, Object> entry : event.getProperties().entrySet()) {
-			urlBuilder.append("&ce_").append(entry.getKey()).append("=")
-					.append(entry.getValue());
+			urlBuilder.append("&ce_").append(encodeUriComponent(entry.getKey()))
+					.append("=")
+					.append(encodeUriComponent(entry.getValue()));
 		}
 		Log.i(LOG_TAG, "Final url:" + urlBuilder.toString());
 		//
@@ -147,6 +149,15 @@ public class WoopraTracker {
 		if (newPingEnabled == false && ping != null) {
 			ping.stopPing();
 		}
+	}
+	
+	public static String encodeUriComponent(String param) {
+		try {
+			return URLEncoder.encode(param, "utf-8");
+		} catch (Exception e) {
+			// will not throw an exception since utf-8 is supported.
+		}
+		return param;
 	}
 
 	/**
