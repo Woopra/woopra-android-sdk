@@ -10,25 +10,12 @@ public class WoopraEvent {
 	private Properties properties = null;
 
 	public WoopraEvent(String eventName) {
-		this.eventName = eventName;
-		properties = new Properties();
+		super(eventName, new Properties();
 	}
 
 	public WoopraEvent(String eventName, Properties properties) {
-		this.eventName = eventName;
-		if (properties != null) {
-			this.properties = properties;
-		} else {
-			properties = new Properties();
-		}
-	}
-
-	public String getEventName() {
-		return eventName;
-	}
-
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
+		this.properties = properties;
+		this.properties.setProperty('name', eventName);
 	}
 
 	public Properties getProperties() {
