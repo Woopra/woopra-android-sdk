@@ -15,7 +15,7 @@ public class WoopraEvent {
 
 	public WoopraEvent(String eventName, Properties properties) {
 		this.properties = properties;
-		this.properties.setProperty('name', eventName);
+		this.properties.setProperty("name", eventName);
 	}
 
 	public Properties getProperties() {
