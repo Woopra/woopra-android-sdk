@@ -1,15 +1,14 @@
 package com.woopra;
 
+import java.net.URLEncoder;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.Properties;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -94,13 +93,13 @@ public class WoopraTracker {
 		}
 		//
 		// Add visitors properties
-		for (Entry<Object, Object> entry : visitor.getProperties().entrySet()) {
+		for (Entry<String, String> entry : visitor.getProperties().entrySet()) {
 			urlBuilder.append("&cv_").append(encodeUriComponent(entry.getKey()))
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
 		// Add Event properties
-		for (Entry<Object, Object> entry : event.getProperties().entrySet()) {
+		for (Entry<String, String> entry : event.getProperties().entrySet()) {
 			urlBuilder.append("&ce_").append(encodeUriComponent(entry.getKey()))
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
@@ -190,10 +189,12 @@ public class WoopraTracker {
 	}
 
 	public void addVisitorProperty(String key, String value) {
-		getVisitor().addProperty(key, value);
+	  if (value != null) {
+	    getVisitor().addProperty(key, value);
+	  }
 	}
 
-	public void addVisitorProperties(Properties newProperties) {
+	public void addVisitorProperties(Map<String,String> newProperties) {
 		getVisitor().addProperties(newProperties);
 	}
 

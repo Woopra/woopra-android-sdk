@@ -1,17 +1,13 @@
 package com.woopra;
 
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import java.util.Properties;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import android.content.Context;
 import android.util.Log;
 
 /**

@@ -1,6 +1,7 @@
 package com.woopra;
 
-import java.util.Properties;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import android.content.Context;
@@ -17,10 +18,10 @@ public class WoopraVisitor {
 	private static final String COOKIE_KEY = "Woopra_android_cookie";
 	private static final String NOT_SET = "NOT_SET";
 	private String cookie;
-	private Properties properties = null;
+	private Map<String,String> properties = null;
 
 	private WoopraVisitor() {
-		properties = new Properties();
+		properties = new LinkedHashMap<String,String>();
 	}
 
 	public static WoopraVisitor getVisitorByContent(Context context) {
@@ -93,19 +94,19 @@ public class WoopraVisitor {
 		this.cookie = cookie;
 	}
 
-	public Properties getProperties() {
+	public Map<String,String> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Properties properties) {
+	public void setProperties(Map<String,String> properties) {
 		this.properties = properties;
 	}
 
-	public void addProperties(Properties newProperties) {
+	public void addProperties(Map<String,String> newProperties) {
 		properties.putAll(newProperties);
 	}
 
 	public void addProperty(String key, String value) {
-		properties.setProperty(key, value);
+		properties.put(key, value);
 	}
 }
