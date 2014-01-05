@@ -40,7 +40,7 @@ public class WoopraTracker {
 	private WoopraTracker() {
 	}
 
-	public static WoopraTracker getInstance() {
+	public static synchronized WoopraTracker getInstance() {
 		if (gSingleton == null) {
 			gSingleton = new WoopraTracker();
 			gSingleton.executor = Executors.newFixedThreadPool(1);
@@ -87,7 +87,7 @@ public class WoopraTracker {
 		urlBuilder.append(W_EVENT_ENDPOINT).append("?host=")
 				.append(getDomain()).append("&cookie=")
 				.append(getVisitor().getCookie())
-				.append("&response=xml&timeout=").append(idleTimeout);
+				.append("&response=xml&os=android&browser=app&timeout=").append(idleTimeout);
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
@@ -104,13 +104,13 @@ public class WoopraTracker {
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
-		Log.i(LOG_TAG, "Final url:" + urlBuilder.toString());
-		//
+		Log.d(LOG_TAG, "Final url:" + urlBuilder.toString());
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(urlBuilder.toString());
 		try {
 			HttpResponse response = httpClient.execute(httpGet);
-			Log.i(LOG_TAG,
+			Log.d(LOG_TAG,
 					"Response:" + EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Got error!", e);

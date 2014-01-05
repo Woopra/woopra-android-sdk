@@ -1,6 +1,7 @@
 package com.woopra;
 
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,10 +19,10 @@ public class WoopraVisitor {
 	private static final String COOKIE_KEY = "Woopra_android_cookie";
 	private static final String NOT_SET = "NOT_SET";
 	private String cookie;
-	private Map<String,String> properties = null;
+  private final Map<String, String> properties = Collections
+      .synchronizedMap(new HashMap<String, String>());
 
 	private WoopraVisitor() {
-		properties = new LinkedHashMap<String,String>();
 	}
 
 	public static WoopraVisitor getVisitorByContent(Context context) {
@@ -96,10 +97,6 @@ public class WoopraVisitor {
 
 	public Map<String,String> getProperties() {
 		return properties;
-	}
-
-	public void setProperties(Map<String,String> properties) {
-		this.properties = properties;
 	}
 
 	public void addProperties(Map<String,String> newProperties) {
