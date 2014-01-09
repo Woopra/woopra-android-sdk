@@ -32,7 +32,7 @@ public class WoopraClientInfo {
 
   WoopraClientInfo(Context context) {
     // do not save the content here since it can result in a memory leak
-    // just precompute everything needed
+    // just pre-compute everything needed
     this.packageName = context.getPackageName();
     this.version = getVersion(context);
     this.screenSize = getScreenSize(context);

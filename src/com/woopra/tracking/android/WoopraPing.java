@@ -29,7 +29,7 @@ import android.util.Log;
  */
 public class WoopraPing {
 
-	public static String LOG_TAG = "WoopraPing";
+	private static String TAG = WoopraPing.class.getName();
 	private static final String W_PING_ENDPOINT = "http://www.woopra.com/track/ping/";
 
 	private final WoopraClientInfo clientInfo;
@@ -55,11 +55,11 @@ public class WoopraPing {
 		HttpGet httpGet = new HttpGet(pingUrl);
 		httpGet.setHeader(CoreProtocolPNames.USER_AGENT, clientInfo.getUserAgent());
 		try {
-			Log.i(LOG_TAG, "Sending ping request:" + pingUrl);
+			Log.i(TAG, "Sending ping request:" + pingUrl);
 			HttpResponse response = pingHttpClient.execute(httpGet);
-			Log.i(LOG_TAG, "Response:" + EntityUtils.toString(response.getEntity()));
+			Log.i(TAG, "Response:" + EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Got error!", e);
+			Log.e(TAG, "Got error!", e);
 		}
 	}
 }
