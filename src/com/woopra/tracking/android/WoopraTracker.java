@@ -1,18 +1,35 @@
-package com.woopra;
+/*
+ * Copyright 2014 Woopra, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.woopra.tracking.android;
 
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
 
-import android.content.Context;
 import android.util.Log;
 
 /**
@@ -21,57 +38,31 @@ import android.util.Log;
  */
 public class WoopraTracker {
 
-	public static String LOG_TAG = "WoopraTracker";
+	private static final String TAG = WoopraTracker.class.getName();
 	private static final String W_EVENT_ENDPOINT = "http://www.woopra.com/track/ce/";
-	private static WoopraTracker gSingleton = null;
-	private ExecutorService executor = null;
-	private String domain = null;
+	
+	private ScheduledExecutorService pingScheduler;
+	private final ExecutorService executor;
+	private final String domain;
+  private final WoopraClientInfo clientInfo;
+  
 	// default timeout value for Woopra service
 	private int idleTimeout = 30;
-	// ping
 	private boolean pingEnabled = false;
 
 	//
 	private String referer = null;
-
 	private WoopraVisitor visitor = null;
-	private WoopraPing ping = null;
+	
 
-	private WoopraTracker() {
-	}
-
-	public static synchronized WoopraTracker getInstance() {
-		if (gSingleton == null) {
-			gSingleton = new WoopraTracker();
-			gSingleton.executor = Executors.newFixedThreadPool(1);
-			gSingleton.setVisitor(WoopraVisitor.getAnonymousVisitor());
-		}
-		return gSingleton;
-	}
-
-	// public void resetVisitorByUniqueId(String uniqueId) {
-	// gSingleton.setVisitor(WoopraVisitor.getVisitorByString(uniqueId));
-	// }
-
-	public void resetVisitorContext(Context context) {
-		gSingleton.setVisitor(WoopraVisitor.getVisitorByContent(context));
+	WoopraTracker(ExecutorService executor, String domain, WoopraVisitor vistor, WoopraClientInfo clientInfo) {
+		this.executor = executor;
+		this.visitor = WoopraVisitor.getAnonymousVisitor();
+	  this.clientInfo = clientInfo;
+	  this.domain = domain;
 	}
 
 	public boolean trackEvent(WoopraEvent event) {
-		if (getDomain() == null) {
-			Log.i(LOG_TAG,
-					"WTracker.domain property must be set before [WTracker trackEvent:] invocation. Ex.: tracker.domain = mywebsite.com");
-			return false;
-		}
-		if (getVisitor() == null) {
-			Log.i(LOG_TAG,
-					"WTracker.visitor property must be set before [WTracker trackEvent:] invocation");
-			return false;
-		}
-		// stop ping
-		if (ping != null) {
-			ping.stopPing();
-		}
 		EventRunner runner = new EventRunner(event);
 		try {
 			executor.execute(runner);
@@ -81,13 +72,19 @@ public class WoopraTracker {
 		return true;
 	}
 
-	private boolean trackEventIntra(WoopraEvent event) {
+	private boolean trackEventImpl(WoopraEvent event) {
 		// generate request url
 		StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(W_EVENT_ENDPOINT).append("?host=")
-				.append(getDomain()).append("&cookie=")
+		urlBuilder.append(W_EVENT_ENDPOINT)
+		    .append("?host=")
+				.append(getDomain())
+				.append("&cookie=")
 				.append(getVisitor().getCookie())
-				.append("&response=xml&os=android&browser=app&timeout=").append(idleTimeout);
+				.append("&screen=")
+				.append(clientInfo.getScreenResolution())
+        .append("&language=")
+        .append(clientInfo.getLanguage())
+				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeout);
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
@@ -104,31 +101,24 @@ public class WoopraTracker {
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
-		Log.d(LOG_TAG, "Final url:" + urlBuilder.toString());
+		Log.d(TAG, "Final url:" + urlBuilder.toString());
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(urlBuilder.toString());
+		httpGet.setHeader(CoreProtocolPNames.USER_AGENT, clientInfo.getUserAgent());
 		try {
 			HttpResponse response = httpClient.execute(httpGet);
-			Log.d(LOG_TAG,
+			Log.d(TAG,
 					"Response:" + EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Got error!", e);
+			Log.e(TAG, "Got error!", e);
 			return false;
 		}
-		// reset ping
-		// if (pingEnabled) {
-		// resetPing(domain, getVisitor().getCookie(), idleTimeout);
-		// }
 		return true;
 	}
 
 	public String getDomain() {
 		return domain;
-	}
-
-	public void setup(String domain) {
-		this.domain = domain;
 	}
 
 	public int getIdleTimeout() {
@@ -145,8 +135,21 @@ public class WoopraTracker {
 
 	public void setPingEnabled(boolean newPingEnabled) {
 		this.pingEnabled = newPingEnabled;
-		if (newPingEnabled == false && ping != null) {
-			ping.stopPing();
+		if (newPingEnabled == false) {
+			pingScheduler.shutdown();
+			pingScheduler = null;
+		} else {
+		  pingScheduler = Executors.newScheduledThreadPool(1);
+		  pingScheduler.scheduleAtFixedRate(new Runnable() {
+
+        @Override
+        public void run() {
+          WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
+              idleTimeout);
+          ping.ping();
+        }
+		    
+		  }, 0, idleTimeout, TimeUnit.SECONDS);
 		}
 	}
 	
@@ -157,19 +160,6 @@ public class WoopraTracker {
 			// will not throw an exception since utf-8 is supported.
 		}
 		return param;
-	}
-
-	/**
-	 * This method must called after resetVisitorByContext and setIdleTimeout
-	 * 
-	 * @param newPingEnabled
-	 */
-	public void resetPing(String domain, String cookie, int idleTimeout) {
-		if (ping != null) {
-			ping.stopPing();
-		}
-		ping = new WoopraPing(domain, cookie, idleTimeout);
-		ping.ping();
 	}
 
 	public WoopraVisitor getVisitor() {
@@ -188,14 +178,14 @@ public class WoopraTracker {
 		this.referer = referer;
 	}
 
-	public void addVisitorProperty(String key, String value) {
+	public void setVisitorProperty(String key, String value) {
 	  if (value != null) {
-	    getVisitor().addProperty(key, value);
+	    getVisitor().setProperty(key, value);
 	  }
 	}
 
-	public void addVisitorProperties(Map<String,String> newProperties) {
-		getVisitor().addProperties(newProperties);
+	public void setVisitorProperties(Map<String,String> newProperties) {
+		getVisitor().setProperties(newProperties);
 	}
 
 	class EventRunner implements Runnable {
@@ -208,13 +198,7 @@ public class WoopraTracker {
 		@Override
 		public void run() {
 			// send track event
-			trackEventIntra(event);
-			// send ping events
-			if (pingEnabled) {
-				ping = new WoopraPing(domain, getVisitor().getCookie(),
-						idleTimeout);
-				ping.ping();
-			}
+			trackEventImpl(event);
 		}
 	}
 }
