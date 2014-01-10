@@ -1,6 +1,23 @@
-package com.woopra;
+/*
+ * Copyright 2014 Woopra, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.woopra.tracking.android;
 
-import java.util.Properties;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import android.content.Context;
@@ -17,13 +34,13 @@ public class WoopraVisitor {
 	private static final String COOKIE_KEY = "Woopra_android_cookie";
 	private static final String NOT_SET = "NOT_SET";
 	private String cookie;
-	private Properties properties = null;
+  private final Map<String, String> properties = Collections
+      .synchronizedMap(new HashMap<String, String>());
 
 	private WoopraVisitor() {
-		properties = new Properties();
 	}
 
-	public static WoopraVisitor getVisitorByContent(Context context) {
+	public static WoopraVisitor getVisitorByContext(Context context) {
 		WoopraVisitor visitor = null;
 		// Application wide preferences
 		SharedPreferences preferences = PreferenceManager
@@ -57,14 +74,14 @@ public class WoopraVisitor {
 	public static WoopraVisitor getVisitorByEmail(String email) {
 		WoopraVisitor visitor = new WoopraVisitor();
 		visitor.setCookie(getUUID(APP_KEY, email));
-		visitor.addProperty("email", email);
+		visitor.setProperty("email", email);
 		return visitor;
 	}
 
 	public static WoopraVisitor getVisitorByString(String key) {
 		WoopraVisitor visitor = new WoopraVisitor();
 		visitor.setCookie(getUUID(APP_KEY, key));
-		visitor.addProperty("email", key);
+		visitor.setProperty("email", key);
 		return visitor;
 	}
 
@@ -73,16 +90,12 @@ public class WoopraVisitor {
 		long leastSigBits = secondKey.hashCode();
 		UUID generateUUID = new UUID(mostSigBits, leastSigBits);
 		String result = generateUUID.toString();
-		result = result.substring(0, 8) + result.substring(9, 13)
-				+ result.substring(14, 18) + result.substring(19, 23)
-				+ result.substring(24);
-		return result.toString();
+		return result.replace("-", "");
 	}
 
 	private static String getUUID() {
 		String s = UUID.randomUUID().toString();
-		return s.substring(0, 8) + s.substring(9, 13) + s.substring(14, 18)
-				+ s.substring(19, 23) + s.substring(24);
+		return s.replace("-", "");
 	}
 
 	public String getCookie() {
@@ -93,19 +106,15 @@ public class WoopraVisitor {
 		this.cookie = cookie;
 	}
 
-	public Properties getProperties() {
+	public Map<String,String> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
-	public void addProperties(Properties newProperties) {
+	public void setProperties(Map<String,String> newProperties) {
 		properties.putAll(newProperties);
 	}
 
-	public void addProperty(String key, String value) {
-		properties.setProperty(key, value);
+	public void setProperty(String key, String value) {
+		properties.put(key, value);
 	}
 }
