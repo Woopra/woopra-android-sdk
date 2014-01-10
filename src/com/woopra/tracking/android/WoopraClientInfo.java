@@ -112,7 +112,7 @@ public class WoopraClientInfo {
     return sb.toString();
   }
 
-  public Object getLanguage() {
+  public String getLanguage() {
     return Locale.getDefault().toString().replace("_", "-");
   }
 }

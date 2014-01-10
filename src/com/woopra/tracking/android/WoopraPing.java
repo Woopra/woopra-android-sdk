@@ -14,6 +14,9 @@
  * limitations under the License.
  */package com.woopra.tracking.android;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -38,15 +41,22 @@ public class WoopraPing {
 
 	public WoopraPing(String domain, String cookie, WoopraClientInfo clientInfo, long idleTimeout) {
 		StringBuilder pingUrlBuilder = new StringBuilder();
-		pingUrlBuilder.append(W_PING_ENDPOINT).append("?host=").append(domain)
-				.append("&cookie=").append(cookie)
-        .append("&screen=")
-        .append(clientInfo.getScreenResolution())
-        .append("&language=")
-        .append(clientInfo.getLanguage())
-        .append("&browser=")
-        .append(clientInfo.getClient())
-				.append("&app=android&response=xml&timeout=").append(idleTimeout);
+		try {
+      pingUrlBuilder.append(W_PING_ENDPOINT)
+          .append("?host=")
+          .append(URLEncoder.encode(domain, "UTF-8"))
+      		.append("&cookie=")
+      		.append(URLEncoder.encode(cookie, "UTF-8"))
+          .append("&screen=")
+          .append(clientInfo.getScreenResolution())
+          .append("&language=")
+          .append(URLEncoder.encode(clientInfo.getLanguage(), "UTF-8"))
+          .append("&browser=")
+          .append(URLEncoder.encode(clientInfo.getClient(), "UTF-8"))
+      		.append("&app=android&response=xml&timeout=").append(idleTimeout);
+    } catch (UnsupportedEncodingException e) {
+      // eat it and will never happen
+    }
 		this.pingUrl = pingUrlBuilder.toString();
 		this.clientInfo = clientInfo;
 	}

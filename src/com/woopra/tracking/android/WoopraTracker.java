@@ -77,15 +77,15 @@ public class WoopraTracker {
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(W_EVENT_ENDPOINT)
 		    .append("?host=")
-				.append(getDomain())
+				.append(encodeUriComponent(getDomain()))
 				.append("&cookie=")
-				.append(getVisitor().getCookie())
+				.append(encodeUriComponent(getVisitor().getCookie()))
 				.append("&screen=")
-				.append(clientInfo.getScreenResolution())
+				.append(encodeUriComponent(clientInfo.getScreenResolution()))
         .append("&language=")
-        .append(clientInfo.getLanguage())
+        .append(encodeUriComponent(clientInfo.getLanguage()))
         .append("&browser=")
-        .append(clientInfo.getClient())
+        .append(encodeUriComponent(clientInfo.getClient()))
 				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
