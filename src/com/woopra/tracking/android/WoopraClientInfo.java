@@ -80,6 +80,14 @@ public class WoopraClientInfo {
     return this.screenResolution;
   }
 
+  public String getClient() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(packageName);
+    sb.append('/');
+    sb.append(version);
+    return sb.toString();
+  }
+
   public String getUserAgent() {
     StringBuilder sb = new StringBuilder();
     sb.append(packageName);

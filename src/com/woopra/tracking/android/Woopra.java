@@ -44,13 +44,13 @@ public class Woopra {
     synchronized (sync) {
       if (visitor == null) {
         visitor = WoopraVisitor.getVisitorByContext(context);
+        Log.d(TAG, "WoopraVistor Cookie: " + visitor.getCookie());
       }
       if (clientInfo == null) {
         clientInfo = new WoopraClientInfo(context);
+        Log.d(TAG, "UserAgent: " + clientInfo.getUserAgent());
       }
     }
-    Log.d(TAG, "UserAgent: " + clientInfo.getUserAgent());
-    Log.d(TAG, "WoopraVistor Cookie: " + visitor.getCookie());
   }
 
   public WoopraTracker getTracker(String domain) {

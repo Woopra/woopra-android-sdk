@@ -47,7 +47,7 @@ public class WoopraTracker {
   private final WoopraClientInfo clientInfo;
   
 	// default timeout value for Woopra service
-	private int idleTimeout = 30;
+	private long idleTimeoutMs = 30000;
 	private boolean pingEnabled = false;
 
 	//
@@ -84,7 +84,9 @@ public class WoopraTracker {
 				.append(clientInfo.getScreenResolution())
         .append("&language=")
         .append(clientInfo.getLanguage())
-				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeout);
+        .append("&browser=")
+        .append(clientInfo.getClient())
+				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
@@ -121,35 +123,46 @@ public class WoopraTracker {
 		return domain;
 	}
 
-	public int getIdleTimeout() {
-		return idleTimeout;
+	public long getIdleTimeout() {
+		return idleTimeoutMs / 1000L;
 	}
 
 	public void setIdleTimeout(int idleTimeout) {
-		this.idleTimeout = idleTimeout;
+		this.idleTimeoutMs = idleTimeout * 1000L;
 	}
 
 	public boolean isPingEnabled() {
 		return pingEnabled;
 	}
 
-	public void setPingEnabled(boolean newPingEnabled) {
-		this.pingEnabled = newPingEnabled;
-		if (newPingEnabled == false) {
-			pingScheduler.shutdown();
-			pingScheduler = null;
-		} else {
-		  pingScheduler = Executors.newScheduledThreadPool(1);
-		  pingScheduler.scheduleAtFixedRate(new Runnable() {
-
-        @Override
-        public void run() {
-          WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
-              idleTimeout);
-          ping.ping();
+	public void setPingEnabled(boolean enabled) {
+		this.pingEnabled = enabled;
+		if (enabled) {
+      if (pingScheduler == null) {
+        long interval = idleTimeoutMs - 5000L;
+        if (interval < 0) {
+          interval /= 2;
         }
-		    
-		  }, 0, idleTimeout, TimeUnit.SECONDS);
+        pingScheduler = Executors.newScheduledThreadPool(1);
+        pingScheduler.scheduleAtFixedRate(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
+                  idleTimeoutMs);
+              ping.ping();
+            } catch (Throwable t) {
+              Log.e(TAG, "unknown ping error", t);
+            }
+          }
+          
+        }, interval, interval, TimeUnit.MILLISECONDS);
+      }
+		} else {
+      if (pingScheduler != null) {
+        pingScheduler.shutdown();
+        pingScheduler = null;
+      }
 		}
 	}
 	

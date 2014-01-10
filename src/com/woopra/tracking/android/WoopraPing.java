@@ -36,7 +36,7 @@ public class WoopraPing {
 	
   private final String pingUrl;
 
-	public WoopraPing(String domain, String cookie, WoopraClientInfo clientInfo, int idleTimeout) {
+	public WoopraPing(String domain, String cookie, WoopraClientInfo clientInfo, long idleTimeout) {
 		StringBuilder pingUrlBuilder = new StringBuilder();
 		pingUrlBuilder.append(W_PING_ENDPOINT).append("?host=").append(domain)
 				.append("&cookie=").append(cookie)
@@ -44,6 +44,8 @@ public class WoopraPing {
         .append(clientInfo.getScreenResolution())
         .append("&language=")
         .append(clientInfo.getLanguage())
+        .append("&browser=")
+        .append(clientInfo.getClient())
 				.append("&app=android&response=xml&timeout=").append(idleTimeout);
 		this.pingUrl = pingUrlBuilder.toString();
 		this.clientInfo = clientInfo;
@@ -55,9 +57,9 @@ public class WoopraPing {
 		HttpGet httpGet = new HttpGet(pingUrl);
 		httpGet.setHeader(CoreProtocolPNames.USER_AGENT, clientInfo.getUserAgent());
 		try {
-			Log.i(TAG, "Sending ping request:" + pingUrl);
+			Log.d(TAG, "Sending ping request:" + pingUrl);
 			HttpResponse response = pingHttpClient.execute(httpGet);
-			Log.i(TAG, "Response:" + EntityUtils.toString(response.getEntity()));
+			Log.d(TAG, "Response:" + EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
 			Log.e(TAG, "Got error!", e);
 		}
