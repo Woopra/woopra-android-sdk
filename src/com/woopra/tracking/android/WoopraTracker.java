@@ -127,7 +127,7 @@ public class WoopraTracker {
 		return idleTimeoutMs / 1000L;
 	}
 
-	public void setIdleTimeout(int idleTimeout) {
+	public void setIdleTimeout(long idleTimeout) {
 		this.idleTimeoutMs = idleTimeout * 1000L;
 	}
 
