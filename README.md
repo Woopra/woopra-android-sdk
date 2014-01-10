@@ -3,7 +3,7 @@
 To setup your tracker SDK, configure the tracker instance as follows (replace mybusiness.com with your website):
 
 ``` java
-Woopra tracker = WoopraTracker.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
+WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
 ```
 
 You can update your idle timeout (default: 30 seconds) by updating the timeout property in your WTracker instance:
