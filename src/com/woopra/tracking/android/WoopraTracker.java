@@ -90,7 +90,7 @@ public class WoopraTracker {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
 		if(deviceType != null){
-			urlBuilder.append("&device=").append(encodeURIComponent(deviceType));
+			urlBuilder.append("&device=").append(encodeUriComponent(deviceType));
 		}
 		//
 		// Add visitors properties
