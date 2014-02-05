@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.woopra.tracking.android;
-
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,14 +43,14 @@ public class WoopraTracker {
 	private ScheduledExecutorService pingScheduler;
 	private final ExecutorService executor;
 	private final String domain;
-  private final WoopraClientInfo clientInfo;
+	private final WoopraClientInfo clientInfo;
   
 	// default timeout value for Woopra service
 	private long idleTimeoutMs = 30000;
 	private boolean pingEnabled = false;
 
 	//
-	private String referer = null;
+	private String referer = null, deviceType=null;
 	private WoopraVisitor visitor = null;
 	
 
@@ -89,6 +88,9 @@ public class WoopraTracker {
 				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
+		}
+		if(deviceType != null){
+			urlBuilder.append("&device=").append(encodeURIComponent(deviceType));
 		}
 		//
 		// Add visitors properties
@@ -189,6 +191,14 @@ public class WoopraTracker {
 
 	public void setReferer(String referer) {
 		this.referer = referer;
+	}
+
+	public void setDeviceType(String deviceType){
+		this.deviceType=deviceType;
+	}
+
+	public String getDeviceType(){
+		return this.deviceType;
 	}
 
 	public void setVisitorProperty(String key, String value) {
