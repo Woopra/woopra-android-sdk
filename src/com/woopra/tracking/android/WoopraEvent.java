@@ -29,7 +29,7 @@ public class WoopraEvent {
 	}
 
 	public WoopraEvent(String eventName, Map<String,String> properties) {
-		if (this.properties != null) {
+		if (properties != null) {
 			this.properties.putAll(properties);
 		}
 		this.properties.put("name", eventName);
