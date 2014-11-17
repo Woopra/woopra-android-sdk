@@ -36,27 +36,27 @@ public class WoopraPing {
 	private static final String W_PING_ENDPOINT = "http://www.woopra.com/track/ping/";
 
 	private final WoopraClientInfo clientInfo;
-	
-  private final String pingUrl;
+
+	private final String pingUrl;
 
 	public WoopraPing(String domain, String cookie, WoopraClientInfo clientInfo, long idleTimeout) {
 		StringBuilder pingUrlBuilder = new StringBuilder();
 		try {
-      pingUrlBuilder.append(W_PING_ENDPOINT)
-          .append("?host=")
-          .append(URLEncoder.encode(domain, "UTF-8"))
-      		.append("&cookie=")
-      		.append(URLEncoder.encode(cookie, "UTF-8"))
-          .append("&screen=")
-          .append(clientInfo.getScreenResolution())
-          .append("&language=")
-          .append(URLEncoder.encode(clientInfo.getLanguage(), "UTF-8"))
-          .append("&browser=")
-          .append(URLEncoder.encode(clientInfo.getClient(), "UTF-8"))
-      		.append("&app=android&response=xml&timeout=").append(idleTimeout);
-    } catch (UnsupportedEncodingException e) {
-      // eat it and will never happen
-    }
+			pingUrlBuilder.append(W_PING_ENDPOINT)
+				.append("?host=")
+				.append(URLEncoder.encode(domain, "UTF-8"))
+				.append("&cookie=")
+				.append(URLEncoder.encode(cookie, "UTF-8"))
+				.append("&screen=")
+				.append(clientInfo.getScreenResolution())
+				.append("&language=")
+				.append(URLEncoder.encode(clientInfo.getLanguage(), "UTF-8"))
+				.append("&browser=")
+				.append(URLEncoder.encode(clientInfo.getClient(), "UTF-8"))
+				.append("&app=android&response=xml&timeout=").append(idleTimeout);
+		} catch (UnsupportedEncodingException e) {
+		// eat it and will never happen
+		}
 		this.pingUrl = pingUrlBuilder.toString();
 		this.clientInfo = clientInfo;
 	}

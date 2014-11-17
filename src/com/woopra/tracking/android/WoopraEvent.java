@@ -22,7 +22,9 @@ import java.util.Map;
  * 
  */
 public class WoopraEvent {
-	private final Map<String,String> properties = new HashMap<String,String>();
+
+	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
+
 
 	public WoopraEvent(String eventName) {
 		this(eventName, null);

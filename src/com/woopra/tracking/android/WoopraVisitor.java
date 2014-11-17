@@ -34,8 +34,7 @@ public class WoopraVisitor {
 	private static final String COOKIE_KEY = "Woopra_android_cookie";
 	private static final String NOT_SET = "NOT_SET";
 	private String cookie;
-  private final Map<String, String> properties = Collections
-      .synchronizedMap(new HashMap<String, String>());
+	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
 
 	private WoopraVisitor() {
 	}

@@ -44,7 +44,7 @@ public class WoopraTracker {
 	private final ExecutorService executor;
 	private final String domain;
 	private final WoopraClientInfo clientInfo;
-  
+
 	// default timeout value for Woopra service
 	private long idleTimeoutMs = 30000;
 	private boolean pingEnabled = false;
@@ -57,8 +57,8 @@ public class WoopraTracker {
 	WoopraTracker(ExecutorService executor, String domain, WoopraVisitor vistor, WoopraClientInfo clientInfo) {
 		this.executor = executor;
 		this.visitor = WoopraVisitor.getAnonymousVisitor();
-	  this.clientInfo = clientInfo;
-	  this.domain = domain;
+		this.clientInfo = clientInfo;
+		this.domain = domain;
 	}
 
 	public boolean trackEvent(WoopraEvent event) {
@@ -74,18 +74,18 @@ public class WoopraTracker {
 	private boolean trackEventImpl(WoopraEvent event) {
 		// generate request url
 		StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(W_EVENT_ENDPOINT)
-		    .append("?host=")
-				.append(encodeUriComponent(getDomain()))
-				.append("&cookie=")
-				.append(encodeUriComponent(getVisitor().getCookie()))
-				.append("&screen=")
-				.append(encodeUriComponent(clientInfo.getScreenResolution()))
-        .append("&language=")
-        .append(encodeUriComponent(clientInfo.getLanguage()))
-        .append("&browser=")
-        .append(encodeUriComponent(clientInfo.getClient()))
-				.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
+		urlBuilder.append(W_EVENT_ENDPOINT).append("?host=")
+			.append(encodeUriComponent(getDomain()))
+			.append("&cookie=")
+			.append(encodeUriComponent(getVisitor().getCookie()))
+			.append("&screen=")
+			.append(encodeUriComponent(clientInfo.getScreenResolution()))
+			.append("&language=")
+			.append(encodeUriComponent(clientInfo.getLanguage()))
+			.append("&browser=")
+			.append(encodeUriComponent(clientInfo.getClient()))
+			.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
+
 		if (referer != null) {
 			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
 		}
@@ -140,31 +140,31 @@ public class WoopraTracker {
 	public void setPingEnabled(boolean enabled) {
 		this.pingEnabled = enabled;
 		if (enabled) {
-      if (pingScheduler == null) {
-        long interval = idleTimeoutMs - 5000L;
-        if (interval < 0) {
-          interval /= 2;
-        }
-        pingScheduler = Executors.newScheduledThreadPool(1);
-        pingScheduler.scheduleAtFixedRate(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
-                  idleTimeoutMs);
-              ping.ping();
-            } catch (Throwable t) {
-              Log.e(TAG, "unknown ping error", t);
-            }
-          }
-          
-        }, interval, interval, TimeUnit.MILLISECONDS);
-      }
+			if (pingScheduler == null) {
+				long interval = idleTimeoutMs - 5000L;
+				if (interval < 0) {
+					interval /= 2;
+				}
+				pingScheduler = Executors.newScheduledThreadPool(1);
+				pingScheduler.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
+						idleTimeoutMs);
+					ping.ping();
+					} catch (Throwable t) {
+						Log.e(TAG, "unknown ping error", t);
+					}
+				}
+
+				}, interval, interval, TimeUnit.MILLISECONDS);
+			}
 		} else {
-      if (pingScheduler != null) {
-        pingScheduler.shutdown();
-        pingScheduler = null;
-      }
+			if (pingScheduler != null) {
+				pingScheduler.shutdown();
+				pingScheduler = null;
+			}
 		}
 	}
 	
@@ -207,7 +207,7 @@ public class WoopraTracker {
 	  }
 	}
 
-	public void setVisitorProperties(Map<String,String> newProperties) {
+	public synchronized void setVisitorProperties(Map<String,String> newProperties) {
 		getVisitor().setProperties(newProperties);
 	}
 
