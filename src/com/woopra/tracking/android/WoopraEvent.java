@@ -25,16 +25,21 @@ public class WoopraEvent {
 
 	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
 
+	private String eventName;
 
 	public WoopraEvent(String eventName) {
 		this(eventName, null);
 	}
 
 	public WoopraEvent(String eventName, Map<String,String> properties) {
+		this.eventName=eventName;
 		if (properties != null) {
 			this.properties.putAll(properties);
 		}
-		this.properties.put("name", eventName);
+	}
+
+	public String getName() {
+		return this.eventName;
 	}
 
 	public Map<String,String> getProperties() {

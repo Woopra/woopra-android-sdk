@@ -99,6 +99,8 @@ public class WoopraTracker {
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
+		urlBuilder.append("&event=").append(encodeUriComponent(event.getName()));
+
 		// Add Event properties
 		for (Entry<String, String> entry : event.getProperties().entrySet()) {
 			urlBuilder.append("&ce_").append(encodeUriComponent(entry.getKey()))
