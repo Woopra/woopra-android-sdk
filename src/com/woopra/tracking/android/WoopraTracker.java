@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.woopra.tracking.android;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,13 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
@@ -109,13 +104,13 @@ public class WoopraTracker {
 		}
 		Log.d(TAG, "Final url:" + urlBuilder.toString());
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(urlBuilder.toString());
-		httpGet.setHeader(CoreProtocolPNames.USER_AGENT, clientInfo.getUserAgent());
 		try {
-			HttpResponse response = httpClient.execute(httpGet);
-			Log.d(TAG,
-					"Response:" + EntityUtils.toString(response.getEntity()));
+			URL url = new URL(urlBuilder.toString());
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("User-Agent", clientInfo.getUserAgent());
+			connection.connect();
+			int result_code = connection.getResponseCode();
+			Log.d(TAG, "Response:" + result_code);
 		} catch (Exception e) {
 			Log.e(TAG, "Got error!", e);
 			return false;
