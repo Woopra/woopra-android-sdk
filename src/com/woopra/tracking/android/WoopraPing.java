@@ -15,14 +15,10 @@
  */package com.woopra.tracking.android;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
@@ -63,13 +59,14 @@ public class WoopraPing {
 
 	public void ping() {
 		//
-		HttpClient pingHttpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(pingUrl);
-		httpGet.setHeader(CoreProtocolPNames.USER_AGENT, clientInfo.getUserAgent());
 		try {
 			Log.d(TAG, "Sending ping request:" + pingUrl);
-			HttpResponse response = pingHttpClient.execute(httpGet);
-			Log.d(TAG, "Response:" + EntityUtils.toString(response.getEntity()));
+			URL url = new URL(pingUrl);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("User-Agent", clientInfo.getUserAgent());
+			connection.connect();
+			int result_code = connection.getResponseCode();
+			Log.d(TAG, "Response:" + result_code);
 		} catch (Exception e) {
 			Log.e(TAG, "Got error!", e);
 		}
