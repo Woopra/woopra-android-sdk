@@ -42,7 +42,7 @@ public class WoopraEvent {
 		return this.eventName;
 	}
 
-	public String getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
