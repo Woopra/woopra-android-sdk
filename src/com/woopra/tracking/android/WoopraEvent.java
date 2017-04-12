@@ -19,13 +19,13 @@ import java.util.Map;
 
 /**
  * @author Woopra on 1/26/2013
- * 
+ *
  */
 public class WoopraEvent {
+	private String eventName;
+	private long timestamp = null;
 
 	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
-
-	private String eventName;
 
 	public WoopraEvent(String eventName) {
 		this(eventName, null);
@@ -40,6 +40,14 @@ public class WoopraEvent {
 
 	public String getName() {
 		return this.eventName;
+	}
+
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public Map<String,String> getProperties() {

@@ -1,22 +1,12 @@
 ## Woopra Android SDK
 
+##INstyantiate Tracker Object
 To setup your tracker SDK, configure the tracker instance as follows (replace mybusiness.com with your website):
 
 ``` java
 WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
 ```
 
-You can update your idle timeout (default: 30 seconds) by updating the timeout property in your WTracker instance:
-
-``` java
-tracker.setIdleTimeout(180); // in seconds
-```
-
-If you want to keep the user online on Woopra even if they don't commit any event between the last event and the idleTimeout, you can enable auto pings:
-
-``` java
-tracker.setPingEnabled(true); // default is false
-```
 
 To add custom visitor properties, you should edit the visitor object:
 
@@ -34,6 +24,7 @@ visitorProps.put("email", "user@company.com");
 tracker.setVisitorProperty(visitorProps);
 ```
 
+##Event Tracking
 To track an event, you must setup a `WoopraEvent` object and track it:
 
 ``` java
@@ -46,17 +37,34 @@ event.setEventProperty("title", "Home Screen");
 tracker.trackEvent(event);
 ```
 
-To add referer information, timestamp, and other track request properties, look at the WoopraTRracker class for an exhaustive list of settier methods.  Here are some common examples:
+##Advanced Settings
+To add referrer information, timestamp, and other track request properties, look at the WoopraTracker and WoopraEvent class public methods for an exhaustive list of setter methods.  Here are some common examples:
+
+###Tracker Settings
+
+If you want to keep the user online on Woopra even if they don't commit any event between the last event and the idleTimeout, you can enable auto pings:
+``` java
+tracker.setPingEnabled(true); // default is false
+```
 
 Track Referrer:
+```java
+tracker.setReferer(<REFERRER_STRING>); //for legacy of this SDK as well as the HTTP, you can use both referer or referrer methods but it will be stored as referer
 ```
-tracker.setReferrer(<REFERER_STRING>); //for legacy of this sdk as well as the HTTP, you can use both referer or referrer interchangeably
+You can update your idle timeout (default: 30 seconds) by updating the timeout property in your WTracker instance:
+
+``` java
+tracker.setIdleTimeout(180); // in seconds
 ```
 
+###Event Settings
 Explicitly Set Timestamp:
+```java
+event.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
 ```
-tracker.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
-```
+
+
+
 
 
 ## License

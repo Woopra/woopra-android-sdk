@@ -46,7 +46,6 @@ public class WoopraTracker {
 
 	//
 	private String referer = null, deviceType=null;
-	private long timestamp = null;
 	private WoopraVisitor visitor = null;
 
 
@@ -88,9 +87,12 @@ public class WoopraTracker {
 		if(deviceType != null){
 			urlBuilder.append("&device=").append(encodeUriComponent(deviceType));
 		}
-		if(timestamp != null){
-			urlBuilder.append("&timestamp=").append(encodeUriComponent(Long.toString(timestamp)));
+
+		//Event settings
+		if (event.getTimestamp() != null) {
+			urlBuilder.append("&timestamp=").append(encodeUriComponent(Long.toString(event.getTimestamp())));
 		}
+
 		//
 		// Add visitors properties
 		for (Entry<String, String> entry : visitor.getProperties().entrySet()) {
@@ -106,8 +108,9 @@ public class WoopraTracker {
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
-		Log.d(TAG, "Final url:" + urlBuilder.toString());
 
+
+		Log.d(TAG, "Final url:" + urlBuilder.toString());
 		try {
 			URL url = new URL(urlBuilder.toString());
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -200,14 +203,6 @@ public class WoopraTracker {
 
 	public void setReferrer(String referer) {
 		this.referer = referer;
-	}
-
-	public String getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
 	}
 
 	public void setDeviceType(String deviceType){
