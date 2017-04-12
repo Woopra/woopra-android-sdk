@@ -28,13 +28,13 @@ import android.util.Log;
 
 /**
  * @author Woopra on 1/26/2013
- * 
+ *
  */
 public class WoopraTracker {
 
 	private static final String TAG = WoopraTracker.class.getName();
 	private static final String W_EVENT_ENDPOINT = "http://www.woopra.com/track/ce/";
-	
+
 	private ScheduledExecutorService pingScheduler;
 	private final ExecutorService executor;
 	private final String domain;
@@ -46,8 +46,9 @@ public class WoopraTracker {
 
 	//
 	private String referer = null, deviceType=null;
+	private long timestamp = null;
 	private WoopraVisitor visitor = null;
-	
+
 
 	WoopraTracker(ExecutorService executor, String domain, WoopraVisitor vistor, WoopraClientInfo clientInfo) {
 		this.executor = executor;
@@ -86,6 +87,9 @@ public class WoopraTracker {
 		}
 		if(deviceType != null){
 			urlBuilder.append("&device=").append(encodeUriComponent(deviceType));
+		}
+		if(timestamp != null){
+			urlBuilder.append("&timestamp=").append(encodeUriComponent(Long.toString(timestamp)));
 		}
 		//
 		// Add visitors properties
@@ -164,7 +168,7 @@ public class WoopraTracker {
 			}
 		}
 	}
-	
+
 	public static String encodeUriComponent(String param) {
 		try {
 			return URLEncoder.encode(param, "utf-8");
@@ -188,6 +192,22 @@ public class WoopraTracker {
 
 	public void setReferer(String referer) {
 		this.referer = referer;
+	}
+
+	public String getReferrer() {
+		return referer;
+	}
+
+	public void setReferrer(String referer) {
+		this.referer = referer;
+	}
+
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public void setDeviceType(String deviceType){
