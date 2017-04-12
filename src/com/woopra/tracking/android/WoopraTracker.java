@@ -89,7 +89,7 @@ public class WoopraTracker {
 		}
 
 		//Event settings
-		if (event.getTimestamp() != null) {
+		if (event.getTimestamp() != -1) {
 			urlBuilder.append("&timestamp=").append(encodeUriComponent(Long.toString(event.getTimestamp())));
 		}
 

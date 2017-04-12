@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class WoopraEvent {
 	private String eventName;
-	private long timestamp = null;
+	private long timestamp = -1;
 
 	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
 
