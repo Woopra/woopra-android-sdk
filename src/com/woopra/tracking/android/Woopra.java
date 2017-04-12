@@ -17,51 +17,65 @@ package com.woopra.tracking.android;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import android.content.Context;
-import android.util.Log;
 
 public class Woopra {
-  private final static String TAG = Woopra.class.getName();
-
-  private final static Object sync = new Object();
 
   private final static Map<String, WoopraTracker> trackers = new HashMap<String, WoopraTracker>();
-
-  private final static ExecutorService executor = Executors
-      .newFixedThreadPool(1);
-
-  private static WoopraVisitor visitor;
-  private static WoopraClientInfo clientInfo;
-
-  public static Woopra getInstance(Context c) {
-    return new Woopra(c);
+  public static Woopra getInstance(Context ctx) {
+       return new Woopra(ctx);
   }
 
+
+  private WoopraVisitor visitor;
+  private WoopraClientInfo clientInfo;
+
+  /**
+   *
+   * @param context
+   */
   private Woopra(Context context) {
-    synchronized (sync) {
-      if (visitor == null) {
-        visitor = WoopraVisitor.getVisitorByContext(context);
-        Log.d(TAG, "WoopraVistor Cookie: " + visitor.getCookie());
-      }
-      if (clientInfo == null) {
-        clientInfo = new WoopraClientInfo(context);
-        Log.d(TAG, "UserAgent: " + clientInfo.getUserAgent());
-      }
-    }
+      this.visitor = WoopraVisitor.getVisitorByContext(context);
+      this.clientInfo = new WoopraClientInfo(context);
   }
 
-  public WoopraTracker getTracker(String domain) {
-    synchronized (sync) {
+  /**
+   *
+   * @param visitor
+   */
+  @Deprecated
+  public void setVisitor(WoopraVisitor visitor){
+    this.visitor=visitor;
+  }
+
+  /**
+   *
+   * @return
+   */
+  public WoopraVisitor getVisitor(){
+    return this.visitor;
+  }
+
+  /**
+   *
+   * @return
+   */
+  public WoopraClientInfo getClientInfo(){
+    return this.clientInfo;
+  }
+
+  /**
+   *
+   * @param domain
+   * @return
+   */
+  public synchronized WoopraTracker getTracker(String domain) {
       WoopraTracker tracker = trackers.get(domain);
       if (tracker == null) {
-        tracker = new WoopraTracker(executor, domain, visitor, clientInfo);
+        tracker = new WoopraTracker(domain, this);
         trackers.put(domain, tracker);
       }
       return tracker;
     }
-  }
 
 }

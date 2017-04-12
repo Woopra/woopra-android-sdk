@@ -30,9 +30,7 @@ import android.preference.PreferenceManager;
  */
 public class WoopraVisitor {
 
-	private static final String APP_KEY = "Woopra_android";
-	private static final String COOKIE_KEY = "Woopra_android_cookie";
-	private static final String NOT_SET = "NOT_SET";
+
 	private String cookie;
 	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
 
@@ -44,12 +42,12 @@ public class WoopraVisitor {
 		// Application wide preferences
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		String cookieStore = preferences.getString(COOKIE_KEY, NOT_SET);
+		String cookieStore = preferences.getString(Constants.COOKIE_KEY, Constants.NOT_SET);
 		// if application first start, create a new cookie
-		if (NOT_SET.equals(cookieStore)) {
+		if (Constants.NOT_SET.equals(cookieStore)) {
 			visitor = getAnonymousVisitor();
 			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString(COOKIE_KEY, visitor.getCookie());
+			editor.putString(Constants.COOKIE_KEY, visitor.getCookie());
 			editor.commit();
 			// else use the exist cookie
 		} else {
@@ -72,47 +70,62 @@ public class WoopraVisitor {
 
 	public static WoopraVisitor getVisitorByEmail(String email) {
 		WoopraVisitor visitor = new WoopraVisitor();
-		visitor.setCookie(getUUID(APP_KEY, email));
+		visitor.setCookie(Utils.getUUID(Constants.APP_KEY, email));
 		visitor.setProperty("email", email);
 		return visitor;
 	}
 
 	public static WoopraVisitor getVisitorByString(String key) {
 		WoopraVisitor visitor = new WoopraVisitor();
-		visitor.setCookie(getUUID(APP_KEY, key));
+		visitor.setCookie(Utils.getUUID(Constants.APP_KEY, key));
 		visitor.setProperty("email", key);
 		return visitor;
 	}
 
-	private static String getUUID(String fristKey, String secondKey) {
-		long mostSigBits = fristKey.hashCode();
-		long leastSigBits = secondKey.hashCode();
-		UUID generateUUID = new UUID(mostSigBits, leastSigBits);
-		String result = generateUUID.toString();
-		return result.replace("-", "");
-	}
+
 
 	private static String getUUID() {
 		String s = UUID.randomUUID().toString();
 		return s.replace("-", "");
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public String getCookie() {
 		return cookie;
 	}
 
+	/**
+	 *
+	 * @param cookie
+	 */
 	public void setCookie(String cookie) {
 		this.cookie = cookie;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public Map<String,String> getProperties() {
 		return properties;
 	}
 
+	/**
+	 *
+	 * @param newProperties
+	 */
 	public void setProperties(Map<String,String> newProperties) {
 		properties.putAll(newProperties);
 	}
 
+	/**
+	 *
+	 * @param key
+	 * @param value
+	 */
 	public void setProperty(String key, String value) {
 		properties.put(key, value);
 	}

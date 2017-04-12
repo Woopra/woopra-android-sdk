@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 package com.woopra.tracking.android;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
+import android.test.AndroidTestCase;
 import android.util.Log;
+import android.content.Context;
 
 /**
  * @author Woopra on 1/26/2013
@@ -32,115 +29,85 @@ import android.util.Log;
  */
 public class WoopraTracker {
 
-	private static final String TAG = WoopraTracker.class.getName();
-	private static final String W_EVENT_ENDPOINT = "http://www.woopra.com/track/ce/";
+	private final static ExecutorService executor = Executors.newFixedThreadPool(1);;
 
-	private ScheduledExecutorService pingScheduler;
-	private final ExecutorService executor;
+
+	private final Woopra woopraContext;
 	private final String domain;
-	private final WoopraClientInfo clientInfo;
-
+	private ScheduledExecutorService pingScheduler;
 	// default timeout value for Woopra service
 	private long idleTimeoutMs = 30000;
 	private boolean pingEnabled = false;
 
 	//
 	private String referer = null, deviceType=null;
-	private WoopraVisitor visitor = null;
 
-
-	WoopraTracker(ExecutorService executor, String domain, WoopraVisitor vistor, WoopraClientInfo clientInfo) {
-		this.executor = executor;
-		this.visitor = WoopraVisitor.getAnonymousVisitor();
-		this.clientInfo = clientInfo;
+	/**
+	 *
+	 * @param domain
+	 * @param woopraContext
+	 */
+	public WoopraTracker(String domain, Woopra woopraContext) {
 		this.domain = domain;
+		this.woopraContext=woopraContext;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
+	public Woopra getWoopraContext(){
+		return this.woopraContext;
+	}
+
+	/**
+	 *
+	 * @param event
+	 * @return
+	 */
 	public boolean trackEvent(WoopraEvent event) {
-		EventRunner runner = new EventRunner(event);
-		try {
-			executor.execute(runner);
-		} catch (Exception e) {
-			return false;
-		}
+		event.setTracker(this);
+		executor.submit(event);
 		return true;
 	}
 
-	private boolean trackEventImpl(WoopraEvent event) {
-		// generate request url
-		StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(W_EVENT_ENDPOINT).append("?host=")
-			.append(encodeUriComponent(getDomain()))
-			.append("&cookie=")
-			.append(encodeUriComponent(getVisitor().getCookie()))
-			.append("&screen=")
-			.append(encodeUriComponent(clientInfo.getScreenResolution()))
-			.append("&language=")
-			.append(encodeUriComponent(clientInfo.getLanguage()))
-			.append("&browser=")
-			.append(encodeUriComponent(clientInfo.getClient()))
-			.append("&app=android&response=xml&os=android&timeout=").append(idleTimeoutMs);
 
-		if (referer != null) {
-			urlBuilder.append("&referer=").append(encodeUriComponent(referer));
-		}
-		if(deviceType != null){
-			urlBuilder.append("&device=").append(encodeUriComponent(deviceType));
-		}
-
-		//Event settings
-		if (event.getTimestamp() != -1) {
-			urlBuilder.append("&timestamp=").append(encodeUriComponent(Long.toString(event.getTimestamp())));
-		}
-
-		//
-		// Add visitors properties
-		for (Entry<String, String> entry : visitor.getProperties().entrySet()) {
-			urlBuilder.append("&cv_").append(encodeUriComponent(entry.getKey()))
-					.append("=")
-					.append(encodeUriComponent(entry.getValue()));
-		}
-		urlBuilder.append("&event=").append(encodeUriComponent(event.getName()));
-
-		// Add Event properties
-		for (Entry<String, String> entry : event.getProperties().entrySet()) {
-			urlBuilder.append("&ce_").append(encodeUriComponent(entry.getKey()))
-					.append("=")
-					.append(encodeUriComponent(entry.getValue()));
-		}
-
-
-		Log.d(TAG, "Final url:" + urlBuilder.toString());
-		try {
-			URL url = new URL(urlBuilder.toString());
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("User-Agent", clientInfo.getUserAgent());
-			connection.connect();
-			int result_code = connection.getResponseCode();
-			Log.d(TAG, "Response:" + result_code);
-		} catch (Exception e) {
-			Log.e(TAG, "Got error!", e);
-			return false;
-		}
-		return true;
-	}
-
+	/**
+	 *
+	 * @return
+	 */
 	public String getDomain() {
 		return domain;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public long getIdleTimeout() {
 		return idleTimeoutMs / 1000L;
 	}
 
+	/**
+	 *
+	 * @param idleTimeout
+	 */
 	public void setIdleTimeout(long idleTimeout) {
 		this.idleTimeoutMs = idleTimeout * 1000L;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public boolean isPingEnabled() {
 		return pingEnabled;
 	}
 
+	/**
+	 *
+	 * @param enabled
+	 */
 	public void setPingEnabled(boolean enabled) {
 		this.pingEnabled = enabled;
 		if (enabled) {
@@ -154,11 +121,9 @@ public class WoopraTracker {
 				@Override
 				public void run() {
 					try {
-						WoopraPing ping = new WoopraPing(domain, getVisitor().getCookie(), clientInfo,
-						idleTimeoutMs);
-					ping.ping();
+						new WoopraPing(WoopraTracker.this).run();
 					} catch (Throwable t) {
-						Log.e(TAG, "unknown ping error", t);
+						Log.e(WoopraTracker.class.getName(), "unknown ping error", t);
 					}
 				}
 
@@ -172,68 +137,89 @@ public class WoopraTracker {
 		}
 	}
 
-	public static String encodeUriComponent(String param) {
-		try {
-			return URLEncoder.encode(param, "utf-8");
-		} catch (Exception e) {
-			// will not throw an exception since utf-8 is supported.
-		}
-		return param;
-	}
-
+	/**
+	 *
+	 * @return
+	 */
+	@Deprecated
 	public WoopraVisitor getVisitor() {
-		return visitor;
+		return woopraContext.getVisitor();
 	}
 
+	/**
+	 *
+	 * @param visitor
+	 */
+	@Deprecated
 	public void setVisitor(WoopraVisitor visitor) {
-		this.visitor = visitor;
+		woopraContext.setVisitor(visitor);
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public String getReferer() {
 		return referer;
 	}
 
+	/**
+	 *
+	 * @param referer
+	 */
 	public void setReferer(String referer) {
 		this.referer = referer;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public String getReferrer() {
 		return referer;
 	}
 
+	/**
+	 *
+	 * @param referer
+	 */
 	public void setReferrer(String referer) {
 		this.referer = referer;
 	}
 
-	public void setDeviceType(String deviceType){
-		this.deviceType=deviceType;
-	}
-
+	/**
+	 *
+	 * @return
+	 */
 	public String getDeviceType(){
 		return this.deviceType;
 	}
 
+	/**
+	 *
+	 * @param deviceType
+	 */
+	public void setDeviceType(String deviceType){
+		this.deviceType=deviceType;
+	}
+
+	/**
+	 *
+	 * @param key
+	 * @param value
+	 */
 	public void setVisitorProperty(String key, String value) {
-	  if (value != null) {
-	    getVisitor().setProperty(key, value);
+	  if (key!=null && value != null) {
+		  woopraContext.getVisitor().setProperty(key, value);
 	  }
 	}
 
+	/**
+	 *
+	 * @param newProperties
+	 */
 	public synchronized void setVisitorProperties(Map<String,String> newProperties) {
-		getVisitor().setProperties(newProperties);
+		woopraContext.getVisitor().setProperties(newProperties);
 	}
-
-	class EventRunner implements Runnable {
-		WoopraEvent event = null;
-
-		public EventRunner(WoopraEvent event) {
-			this.event = event;
-		}
-
-		@Override
-		public void run() {
-			// send track event
-			trackEventImpl(event);
-		}
-	}
+ 
 }

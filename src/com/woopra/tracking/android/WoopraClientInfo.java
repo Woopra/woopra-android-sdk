@@ -30,7 +30,7 @@ public class WoopraClientInfo {
   private final String screenSize;
   private final String screenResolution;
 
-  WoopraClientInfo(Context context) {
+  public WoopraClientInfo(Context context) {
     // do not save the content here since it can result in a memory leak
     // just pre-compute everything needed
     this.packageName = context.getPackageName();
@@ -39,6 +39,11 @@ public class WoopraClientInfo {
     this.screenResolution = getScreenResolution(context); 
   }
 
+  /**
+   *
+   * @param context
+   * @return
+   */
   private String getScreenResolution(Context context) {
     DisplayMetrics dm = context.getResources().getDisplayMetrics();
     StringBuilder sb = new StringBuilder();
@@ -48,6 +53,11 @@ public class WoopraClientInfo {
     return sb.toString();
   }
 
+  /**
+   *
+   * @param context
+   * @return
+   */
   private String getVersion(Context context) {
     String version = "";
     try {
@@ -60,6 +70,11 @@ public class WoopraClientInfo {
     return version;
   }
 
+  /**
+   *
+   * @param context
+   * @return
+   */
   private String getScreenSize(Context context) {
     String size = "unknown";
     int screen = context.getResources().getConfiguration().screenLayout
@@ -76,10 +91,18 @@ public class WoopraClientInfo {
     return size;
   }
 
+  /**
+   *
+   * @return
+   */
   public String getScreenResolution() {
     return this.screenResolution;
   }
 
+  /**
+   *
+   * @return
+   */
   public String getClient() {
     StringBuilder sb = new StringBuilder();
     sb.append(packageName);
@@ -88,6 +111,10 @@ public class WoopraClientInfo {
     return sb.toString();
   }
 
+  /**
+   *
+   * @return
+   */
   public String getUserAgent() {
     StringBuilder sb = new StringBuilder();
     sb.append(packageName);
@@ -112,6 +139,10 @@ public class WoopraClientInfo {
     return sb.toString();
   }
 
+  /**
+   *
+   * @return
+   */
   public String getLanguage() {
     return Locale.getDefault().toString().replace("_", "-");
   }

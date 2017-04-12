@@ -26,49 +26,41 @@ import android.util.Log;
  * @author Woopra on 1/26/2013
  * 
  */
-public class WoopraPing {
+public class WoopraPing implements Runnable{
 
-	private static String TAG = WoopraPing.class.getName();
-	private static final String W_PING_ENDPOINT = "http://www.woopra.com/track/ping/";
-
-	private final WoopraClientInfo clientInfo;
-
-	private final String pingUrl;
-
-	public WoopraPing(String domain, String cookie, WoopraClientInfo clientInfo, long idleTimeout) {
-		StringBuilder pingUrlBuilder = new StringBuilder();
-		try {
-			pingUrlBuilder.append(W_PING_ENDPOINT)
-				.append("?host=")
-				.append(URLEncoder.encode(domain, "UTF-8"))
-				.append("&cookie=")
-				.append(URLEncoder.encode(cookie, "UTF-8"))
-				.append("&screen=")
-				.append(clientInfo.getScreenResolution())
-				.append("&language=")
-				.append(URLEncoder.encode(clientInfo.getLanguage(), "UTF-8"))
-				.append("&browser=")
-				.append(URLEncoder.encode(clientInfo.getClient(), "UTF-8"))
-				.append("&app=android&response=xml&timeout=").append(idleTimeout);
-		} catch (UnsupportedEncodingException e) {
-		// eat it and will never happen
-		}
-		this.pingUrl = pingUrlBuilder.toString();
-		this.clientInfo = clientInfo;
+	private final WoopraTracker tracker;
+	/**
+	 *
+	 * @param tracker
+	 */
+	public WoopraPing(WoopraTracker tracker) {
+		this.tracker=tracker;
 	}
 
-	public void ping() {
-		//
+	/**
+	 *
+	 */
+	@Override
+	public void run() {
 		try {
-			Log.d(TAG, "Sending ping request:" + pingUrl);
+
+			String pingUrl = new StringBuilder()
+					.append(Constants.W_PING_ENDPOINT)
+					.append("?host=")
+					.append(Utils.encode(tracker.getDomain()))
+					.append("&cookie=")
+					.append(Utils.encode(tracker.getWoopraContext().getVisitor().getCookie()))
+					.append("&app=android&response=xml&timeout=")
+					.append(tracker.getIdleTimeout()).toString();
+
+			Log.d(WoopraPing.class.getName(), "Sending ping request:" + pingUrl);
 			URL url = new URL(pingUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("User-Agent", clientInfo.getUserAgent());
 			connection.connect();
 			int result_code = connection.getResponseCode();
-			Log.d(TAG, "Response:" + result_code);
+			Log.d(WoopraPing.class.getName(), "Response:" + result_code);
 		} catch (Exception e) {
-			Log.e(TAG, "Got error!", e);
+			Log.e(WoopraPing.class.getName(), "Got error!", e);
 		}
 	}
 }
