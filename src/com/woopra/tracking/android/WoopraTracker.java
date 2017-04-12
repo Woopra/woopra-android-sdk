@@ -19,6 +19,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -100,6 +102,8 @@ public class WoopraTracker {
 					.append("=")
 					.append(encodeUriComponent(entry.getValue()));
 		}
+
+		//Event name
 		urlBuilder.append("&event=").append(encodeUriComponent(event.getName()));
 
 		// Add Event properties
@@ -109,8 +113,20 @@ public class WoopraTracker {
 					.append(encodeUriComponent(entry.getValue()));
 		}
 
+		//Add Campaign data
+		//conventional fields:
+		List<String> campaignDataFields = Arrays.asList("campaign_name", "campaign_id", "campaign_source", "campaign_term", "campaign_medium", "campaign_content");
+		for (Entry<String, String> entry : event.getCampaignProperties().entrySet()) {
+			if (campaignDataFields.contains(entry.getKey()) && entry.getValue() != null) {
+				urlBuilder.append("&ce_").append(encodeUriComponent(entry.getKey()))
+						.append("=")
+						.append(encodeUriComponent(entry.getValue()));
+			}
+		}
+
 
 		Log.d(TAG, "Final url:" + urlBuilder.toString());
+
 		try {
 			URL url = new URL(urlBuilder.toString());
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -63,6 +63,32 @@ Explicitly Set Timestamp:
 event.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
 ```
 
+### Campaign Data
+To Set Campaign Data on the event, use `event.setCampaignProperties(Map<String, String>)` Or the individual property setters, e.g.: `event setCampaignName(String)`:
+```java
+    event.setCampaignName(<String>);
+    event.setCampaignId(<String>);
+    event.setCampaignSource(<String>);
+    event.setCampaignTerm(<String>);
+    event.setCampaignMedium(<String>);
+    event.setCampaignContent(<String>);
+```
+
+OR:
+
+```java
+Map<String, String> campaignProps = new java.util.concurrent.ConcurrentHashMap<String, String>()
+
+campaignProps.put("campaign_name", <String>);
+campaignProps.put("campaign_id", <String>);
+campaignProps.put("campaign_source", <String>);
+campaignProps.put("campaign_term", <String>);
+campaignProps.put("campaign_medium", <String>);
+campaignProps.put("campaign_content", <String>);
+
+event.setCampaignProperties(campaignProps);
+```
+
 
 
 
