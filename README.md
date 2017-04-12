@@ -30,8 +30,8 @@ To track an event, you must setup a `WoopraEvent` object and track it:
 ``` java
 // setup event
 WoopraEvent event = new WoopraEvent("appview");
-event.setEventProperty("view", "home screen");
-event.setEventProperty("title", "Home Screen");
+event.setProperty("view", "home screen");
+event.setProperty("title", "Home Screen");
 
 // track event
 tracker.trackEvent(event);
