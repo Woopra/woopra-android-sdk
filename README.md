@@ -1,6 +1,6 @@
 ## Woopra Android SDK
 
-##INstyantiate Tracker Object
+## Instantiate Tracker Object
 To setup your tracker SDK, configure the tracker instance as follows (replace mybusiness.com with your website):
 
 ``` java
@@ -24,7 +24,7 @@ visitorProps.put("email", "user@company.com");
 tracker.setVisitorProperty(visitorProps);
 ```
 
-##Event Tracking
+## Event Tracking
 To track an event, you must setup a `WoopraEvent` object and track it:
 
 ``` java
@@ -37,10 +37,10 @@ event.setEventProperty("title", "Home Screen");
 tracker.trackEvent(event);
 ```
 
-##Advanced Settings
+## Advanced Settings
 To add referrer information, timestamp, and other track request properties, look at the WoopraTracker and WoopraEvent class public methods for an exhaustive list of setter methods.  Here are some common examples:
 
-###Tracker Settings
+### Tracker Settings
 
 If you want to keep the user online on Woopra even if they don't commit any event between the last event and the idleTimeout, you can enable auto pings:
 ``` java
@@ -57,7 +57,7 @@ You can update your idle timeout (default: 30 seconds) by updating the timeout p
 tracker.setIdleTimeout(180); // in seconds
 ```
 
-###Event Settings
+### Event Settings
 Explicitly Set Timestamp:
 ```java
 event.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
