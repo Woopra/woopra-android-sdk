@@ -19,8 +19,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -56,15 +58,39 @@ public class WoopraTracker {
 		this.domain = domain;
 	}
 
+	/**
+	 * Tracks given event. This is asynchronous method.
+	 *
+	 * This method is deprecated, use {@link  #trackEventWithFuture(WoopraEvent)}
+	 * @param event event to track
+	 * @return false, if failed to add event to queue
+     */
+	@Deprecated
 	public boolean trackEvent(WoopraEvent event) {
 		EventRunner runner = new EventRunner(event);
 		try {
-			executor.execute(runner);
+			executor.submit(runner);
 		} catch (Exception e) {
 			return false;
 		}
 		return true;
 	}
+
+	/**
+	 * Tracks given event. This is asynchronous method.
+	 * @param event event to track
+	 * @return future object, allows to track progress of execution or null, if failed to add event to queue
+     */
+	public Future<Boolean> trackEventWithFuture(WoopraEvent event) {
+		EventRunner runner = new EventRunner(event);
+		try {
+			return executor.submit(runner);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+
 
 	private boolean trackEventImpl(WoopraEvent event) {
 		// generate request url
@@ -223,7 +249,7 @@ public class WoopraTracker {
 		getVisitor().setProperties(newProperties);
 	}
 
-	class EventRunner implements Runnable {
+	class EventRunner implements Callable<Boolean> {
 		WoopraEvent event = null;
 
 		public EventRunner(WoopraEvent event) {
@@ -231,9 +257,9 @@ public class WoopraTracker {
 		}
 
 		@Override
-		public void run() {
+		public Boolean call() {
 			// send track event
-			trackEventImpl(event);
+			return trackEventImpl(event);
 		}
 	}
 }
