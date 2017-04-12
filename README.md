@@ -46,6 +46,19 @@ event.setEventProperty("title", "Home Screen");
 tracker.trackEvent(event);
 ```
 
+To add referer information, timestamp, and other track request properties, look at the WoopraTRracker class for an exhaustive list of settier methods.  Here are some common examples:
+
+Track Referrer:
+```
+tracker.setReferrer(<REFERER_STRING>); //for legacy of this sdk as well as the HTTP, you can use both referer or referrer interchangeably
+```
+
+Explicitly Set Timestamp:
+```
+tracker.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
+```
+
+
 ## License
 
 Except as otherwise noted, the Woopra Android SDK is licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html).
