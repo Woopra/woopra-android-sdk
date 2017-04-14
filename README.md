@@ -37,6 +37,17 @@ event.setProperty("title", "Home Screen");
 tracker.trackEvent(event);
 ```
 
+## Identifying
+You can send an identify call without tracking an event by using the `tracker.push()` method: 
+
+```java
+tracker.setVisitorProperty("name", "User Name");
+tracker.setVisitorProperty("email", "user@company.com");
+//Visitor data has not been sent to Woopra
+tracker.push();
+//visitor data has been sent to Woopra, but no event has been tracked
+```
+
 ## Advanced Settings
 To add referrer information, timestamp, and other track request properties, look at the WoopraTracker and WoopraEvent class public methods for an exhaustive list of setter methods.  Here are some common examples:
 
