@@ -71,6 +71,14 @@ public class WoopraTracker {
 		return true;
 	}
 
+	/**
+	 *
+	 */
+	public boolean push(){
+		WoopraIdentify identify=new WoopraIdentify(this);
+		executor.submit(identify);
+		return true;
+	}
 
 	/**
 	 *
