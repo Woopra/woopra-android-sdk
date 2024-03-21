@@ -1,2 +1,2 @@
 rootProject.name = "woopra-android-sdk"
-include ':app'
+include ':woopra'
