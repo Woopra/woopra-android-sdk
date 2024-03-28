@@ -1,4 +1,4 @@
-package woopra;
+package com.woopra.tracking.android;
 
 /**
  * Created by dev on 4/12/17.

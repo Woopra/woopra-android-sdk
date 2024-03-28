@@ -1,4 +1,4 @@
-package woopra;
+package com.woopra.tracking.android;
 
 import java.net.URLEncoder;
 import java.util.UUID;
