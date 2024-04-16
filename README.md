@@ -53,11 +53,6 @@ To add referrer information, timestamp, and other track request properties, look
 
 ### Tracker Settings
 
-If you want to keep the user online on Woopra even if they don't commit any event between the last event and the idleTimeout, you can enable auto pings:
-``` java
-tracker.setPingEnabled(true); // default is false
-```
-
 Track Referrer:
 ```java
 tracker.setReferer(<REFERRER_STRING>); //for legacy of this SDK as well as the HTTP, you can use both referer or referrer methods but it will be stored as referer
