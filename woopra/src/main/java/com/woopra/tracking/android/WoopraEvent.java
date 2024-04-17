@@ -17,8 +17,12 @@ package com.woopra.tracking.android;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
@@ -167,64 +171,64 @@ public class WoopraEvent implements Runnable{
 	 *
 	 */
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
+        try {
+            JSONObject postBody = new JSONObject()
+                    .put("host", tracker.getDomain())
+                    .put("cookie", tracker.getWoopraContext().getVisitor().getCookie())
+                    .put("screen", tracker.getWoopraContext().getClientInfo().getScreenResolution())
+                    .put("language", tracker.getWoopraContext().getClientInfo().getLanguage())
+                    .put("browser", tracker.getWoopraContext().getClientInfo().getClient())
+                    .put("app", "android")
+                    .put("response", "xml")
+                    .put("os", "android")
+                    .put("timeout", tracker.getIdleTimeout());
 
-		StringBuilder urlBuilder = new StringBuilder().
-				append(Constants.W_TRACK_ENDPOINT).append("?host=")
-				.append(Utils.encode(tracker.getDomain()))
-				.append("&cookie=")
-				.append(Utils.encode(tracker.getWoopraContext().getVisitor().getCookie()))
-				.append("&screen=")
-				.append(Utils.encode(tracker.getWoopraContext().getClientInfo().getScreenResolution()))
-				.append("&language=")
-				.append(Utils.encode(tracker.getWoopraContext().getClientInfo().getLanguage()))
-				.append("&browser=")
-				.append(Utils.encode(tracker.getWoopraContext().getClientInfo().getClient()))
-				.append("&app=android")
-				.append("&response=xml")
-				.append("&os=android")
-				.append("&timeout=").append(tracker.getIdleTimeout());
+            if (tracker.getReferrer() != null) {
+                postBody.put("referer", tracker.getReferrer());
+            }
+            if (tracker.getDeviceType() != null) {
+                postBody.put("device", tracker.getDeviceType());
+            }
 
-		if (tracker.getReferrer() != null) {
-			urlBuilder.append("&referer=").append(Utils.encode(tracker.getReferrer()));
-		}
-		if (tracker.getDeviceType() != null) {
-			urlBuilder.append("&device=").append(Utils.encode(tracker.getDeviceType()));
-		}
+            //Event settings
+            if (getTimestamp() != -1) {
+                postBody.put("timestamp", Long.toString(getTimestamp()));
+            }
 
-		//Event settings
-		if (getTimestamp() != -1) {
-			urlBuilder.append("&timestamp=").append(Utils.encode(Long.toString(getTimestamp())));
-		}
+            // Add visitors properties
+            for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
+                postBody.put("cv_" + entry.getKey(), entry.getValue());
+            }
 
-		//
-		// Add visitors properties
-		for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
-			urlBuilder.append("&cv_").append(Utils.encode(entry.getKey()))
-					.append("=")
-					.append(Utils.encode(entry.getValue()));
-		}
-		urlBuilder.append("&event=").append(Utils.encode(getName()));
+            postBody.put("event", getName());
+            // Add Event properties
+            for (Map.Entry<String, String> entry : getProperties().entrySet()) {
+                postBody.put("ce_" + entry.getKey(), entry.getValue());
+            }
+            Log.d(WoopraEvent.class.getName(), "Track event: " + getName());
 
-		// Add Event properties
-		for (Map.Entry<String, String> entry : getProperties().entrySet()) {
-			urlBuilder.append("&ce_").append(Utils.encode(entry.getKey()))
-					.append("=")
-					.append(Utils.encode(entry.getValue()));
-		}
+            URL url = new URL(Constants.W_TRACK_ENDPOINT);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("User-Agent", tracker.getWoopraContext().getClientInfo().getUserAgent());
+            connection.setRequestProperty("content-type", "application/json");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(10000);
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+            connection.setDoInput(false);
+            connection.connect();
 
-
-		Log.d(WoopraEvent.class.getName(), "Final url:" + urlBuilder.toString());
-		try {
-			URL url = new URL(urlBuilder.toString());
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("User-Agent", tracker.getWoopraContext().getClientInfo().getUserAgent());
-			connection.connect();
-			int result_code = connection.getResponseCode();
-			Log.d(WoopraEvent.class.getName(), "Response:" + result_code);
-		} catch (Exception e) {
-			Log.e(WoopraEvent.class.getName(), "Got error!", e);
-		}
-	}
+            byte[] postBodyByte = postBody.toString().getBytes(StandardCharsets.UTF_8);
+            connection.getOutputStream().write(postBodyByte);
+            int responseCode = connection.getResponseCode();
+            Log.d(WoopraEvent.class.getName(), "Response: " + responseCode);
+        } catch (JSONException e) {
+            Log.e(WoopraEvent.class.getName(), "Failed to make POST request body when tracking events", e);
+        } catch (Exception e) {
+            Log.e(WoopraEvent.class.getName(), "Failed to make HTTP request when tracking events", e);
+        }
+    }
 }

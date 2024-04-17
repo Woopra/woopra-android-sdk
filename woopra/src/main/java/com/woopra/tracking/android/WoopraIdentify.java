@@ -17,8 +17,12 @@ package com.woopra.tracking.android;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -42,34 +46,41 @@ public class WoopraIdentify implements Runnable{
 
     @Override
     public void run() {
-
-        StringBuilder urlBuilder = new StringBuilder().
-                append(Constants.W_IDENTIFY_ENDPOINT).append("?host=")
-                .append(Utils.encode(tracker.getDomain()))
-                .append("&cookie=")
-                .append(Utils.encode(tracker.getWoopraContext().getVisitor().getCookie()))
-                .append("&app=android")
-                .append("&response=xml")
-                .append("&os=android")
-                .append("&timeout=").append(tracker.getIdleTimeout());
-
-
-        // Add visitors properties
-        for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
-            urlBuilder.append("&cv_").append(Utils.encode(entry.getKey()))
-                    .append("=")
-                    .append(Utils.encode(entry.getValue()));
-        }
-
-        Log.d(WoopraEvent.class.getName(), "Final url:" + urlBuilder.toString());
         try {
-            URL url = new URL(urlBuilder.toString());
+            JSONObject postBody = new JSONObject()
+                    .put("host", tracker.getDomain())
+                    .put("cookie", tracker.getWoopraContext().getVisitor().getCookie())
+                    .put("app", "android")
+                    .put("response", "xml")
+                    .put("os", "android")
+                    .put("timeout", tracker.getIdleTimeout());
+
+            // Add visitors properties
+            for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
+                postBody.put("cv_" + entry.getKey(), entry.getValue());
+            }
+
+            Log.d(WoopraEvent.class.getName(), "Identify visitor");
+            URL url = new URL(Constants.W_IDENTIFY_ENDPOINT);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("User-Agent", tracker.getWoopraContext().getClientInfo().getUserAgent());
+            connection.setRequestProperty("content-type", "application/json");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(10000);
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+            connection.setDoInput(false);
             connection.connect();
-            int result_code = connection.getResponseCode();
-            Log.d(WoopraEvent.class.getName(), "Response:" + result_code);
+
+            byte[] postBodyByte = postBody.toString().getBytes(StandardCharsets.UTF_8);
+            connection.getOutputStream().write(postBodyByte);
+            int responseCode = connection.getResponseCode();
+            Log.d(WoopraEvent.class.getName(), "Response: " + responseCode);
+        } catch (JSONException e) {
+            Log.e(WoopraEvent.class.getName(), "Failed to make POST request body when identifying visitors", e);
         } catch (Exception e) {
-            Log.e(WoopraEvent.class.getName(), "Got error!", e);
+            Log.e(WoopraEvent.class.getName(), "Failed to make HTTP request when identifying visitors", e);
         }
     }
 }
