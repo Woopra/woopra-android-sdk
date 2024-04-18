@@ -97,23 +97,53 @@ To add referrer information, timestamp, and other track request properties, look
 
 ### Tracker Settings
 
-Track Referrer:
-```java
-tracker.setReferer(<REFERRER_STRING>); //for legacy of this SDK as well as the HTTP, you can use both referer or referrer methods but it will be stored as referer
-```
-You can update your idle timeout (default: 30 seconds) by updating the timeout property in your WTracker instance:
+#### Track Referrer
 
 ``` java
-tracker.setIdleTimeout(180); // in seconds
+// Java
+tracker.setReferer(<REFERRER_STRING>);
 ```
+
+``` kotlin
+// Kotlin
+tracker.referer = <REFERRER_STRING>
+```
+
+> [!NOTE]
+> For legacy of this SDK as well as the HTTP, you can use both `referer` or `referrer` methods, but it will be stored as `referer`.
+
+#### Idle Timeout
+
+You can update your idle timeout (default: 30 seconds) by updating the timeout property in your Woopra tracker:
+
+``` java
+// Java
+tracker.setIdleTimeout(180);
+```
+
+``` kotlin
+// Kotlin
+tracker.idleTimeout = 180
+```
+
+> [!NOTE]
+> The idle timeout is in second.
 
 ### Event Settings
 Explicitly Set Timestamp:
-```java
-event.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>); //Note this is unix epoch time in milliseconds
+
+``` java
+// Java
+event.setTimestamp(<LONG_UNIX_MS_TIMESTAMP>);
 ```
 
+``` kotlin
+// Kotlin
+event.timestamp = <LONG_UNIX_MS_TIMESTAMP>
+```
 
+> [!NOTE]
+> The unix epoch time is in milliseconds.
 
 
 
