@@ -3,9 +3,17 @@
 ## Instantiate Tracker Object
 To setup your tracker SDK, configure the tracker instance as follows (replace mybusiness.com with your website):
 
-``` java
-WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
-```
+=== "Java"
+
+    ``` java
+    WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
+    ```
+
+=== "Kotlin"
+
+    ``` java
+    WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com");
+    ```
 
 
 To add custom visitor properties, you should edit the visitor object:
