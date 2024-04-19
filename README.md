@@ -97,6 +97,7 @@ To add referrer information, timestamp, and other track request properties, look
 
 ### Tracker Settings
 
+<<<<<<< HEAD
 #### Track Referrer
 
 ``` java
