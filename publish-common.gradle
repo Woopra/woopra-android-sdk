@@ -1,0 +1,62 @@
+apply plugin: 'maven-publish'
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.test.java.srcDirs
+    // It's also a good practice for a closed-source SDK to expose some API interfaces
+    // with source code, here we assume these has suffix of '.api' in there package name.
+    include("**/api/*.java")
+    include("**/api/*.kt")
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    include("**/api/*.java")
+    include("**/api/*.kt")
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                artifact sourcesJar {
+                    classifier "sources" // this appends '-sources' to the filename of jar
+                }
+                artifact javadocJar {
+                    classifier "javadoc" // this appends '-javadoc' to the filename of jar
+                }
+                groupId = rootProject.groupId
+                artifactId = project.artifactId
+                version = version
+                pom {
+                    name = "${rootProject.groupId}:${project.artifactId}"
+                    description = project.description
+                    url = rootProject.url
+                    scm {
+                        url = rootProject.scmUrl
+                    }
+                    licenses {
+                        license {
+                            name = rootProject.licenseName
+                            url = rootProject.licenseUrl
+                        }
+                    }
+                    developers {
+                        developer {
+                            email = rootProject.developerEmail
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: "$rootProject.projectDir/publish-maven-central.gradle"

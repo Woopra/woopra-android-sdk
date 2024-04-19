@@ -1,6 +1,34 @@
-## Woopra Android SDK
+# Woopra Android SDK
+
+## Installation
+
+To declare the mavenCentral() repository. Add mavenCentral() in the project-level build.gradle.
+``` gradle
+allprojects {
+    repositories {
+        ...
+        mavenCentral()
+        ...
+    }
+}
+```
+
+Or in the app module's build.gradle
+``` gradle
+repositories {
+    ...
+    mavenCentral()
+    ...
+}
+```
+
+Then add dependencies to app/build.gradle
+``` gradle
+implementation 'com.appier:woopra-android:1.1.0'
+```
 
 ## Instantiate Tracker Object
+
 To setup your tracker SDK, configure the tracker instance as follows (replace `mybusiness.com` with your domain name):
 
 ``` java
@@ -50,6 +78,7 @@ tracker.setVisitorProperties(visitorProps)
 ```
 
 ## Event Tracking
+
 To track an event, you must setup a `WoopraEvent` object and track it:
 
 ``` java
@@ -77,7 +106,8 @@ tracker.trackEvent(event)
 ```
 
 ## Identifying
-You can send an identify call without tracking an event by using the `tracker.push()` method: 
+
+You can send an identify call without tracking an event by using the `tracker.push()` method:
 
 ``` java
 // Java
@@ -100,6 +130,7 @@ tracker.push()
 ```
 
 ## Advanced Settings
+
 To add referrer information, timestamp, and other track request properties, look at the `WoopraTracker` and `WoopraEvent` class public methods for an exhaustive list of setter methods.  Here are some common examples:
 
 ### Tracker Settings

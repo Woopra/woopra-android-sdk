@@ -1,0 +1,57 @@
+// Reference: https://proandroiddev.com/publishing-android-libraries-to-mavencentral-in-2021-8ac9975c3e52
+// Note: use hkp://keyserver.ubuntu.com to upload GPG key, or mavenCentral() may not find the key...
+
+apply plugin: 'signing'
+
+tasks.withType(Sign) {
+    onlyIf { !version.endsWith("SNAPSHOT") && !version.endsWith("LOCAL") }
+}
+
+ext['signing.secretKeyRingFile'] = getLocalPropertyOrEnv('signing.key.file')
+ext['signing.keyId'] = getLocalPropertyOrEnv('signing.key.id')
+ext['signing.password'] = getLocalPropertyOrEnv('signing.key.password')
+
+signing {
+    sign publishing.publications
+}
+
+ext['ossrhUsername'] = getLocalPropertyOrEnv('ossrh.username')
+ext['ossrhPassword'] = getLocalPropertyOrEnv('ossrh.password')
+
+publishing {
+    repositories {
+        maven {
+            // This is for test with local environment.
+            // DO MAKE SURE the version in gradle.properties is appended with "-LOCAL"
+            // when executing the following command for publishing:
+            // ./gradlew publish -Dpublication=release
+            // (You can specify JAVA by appending "-Dorg.gradle.java.home=/Users/${user}/Library/Java/JavaVirtualMachines/corretto-11.0.21/Contents/Home")
+            if (project.version.endsWith('-LOCAL')) {
+                String mavenLocal = "$projectDir/build/mavenLocal"
+                name = 'mavenLocal'
+                url = "file://$mavenLocal"
+            } else {
+                name = 'mavenCentral'
+                if (project.version.endsWith('-SNAPSHOT')) {
+                    // Notes about snapshot repo:
+                    // 1. There is no 'close' and 'release' workflow like in staging repo
+                    // 2. What's a SNAPSHOT version semanticallly: https://maven.apache.org/guides/getting-started/index.html#What_is_a_SNAPSHOT_version
+                    // 3. Packages can only be resolved by using custom maven URL: `maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }`
+                    url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                } else {
+                    // Notes about staging repo:
+                    // 1. It requires 'close' and 'release' workflow. Supposedly a closed package should only be released after QA activity.
+                    // 2. It will block versions end with '-SNAPSHOT' with '400 Bad Request'
+                    // 3. After 'close', packages can be resolved by using custom maven URL: `maven { url 'https://s01.oss.sonatype.org/content/groups/staging/' }`
+                    // 4. After 'release', packages will be sync to mavenCentral().
+                    url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                }
+
+                credentials {
+                    username project.ossrhUsername
+                    password project.ossrhPassword
+                }
+            }
+        }
+    }
+}
