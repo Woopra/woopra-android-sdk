@@ -8,21 +8,6 @@ import java.util.UUID;
  */
 
 public class Utils {
-
-    /**
-     *
-     * @param param
-     * @return
-     */
-    public static String encode(String param) {
-        try {
-            return URLEncoder.encode(param, "utf-8");
-        } catch (Exception e) {
-            // will not throw an exception since utf-8 is supported.
-        }
-        return param;
-    }
-
     /**
      *
      * @param fristKey
