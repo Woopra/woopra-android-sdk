@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Woopra on 1/26/2013
  *
  */
-public class WoopraIdentify implements Runnable{
+public class WoopraIdentify implements Runnable {
 
     private WoopraTracker tracker;
 
@@ -56,7 +56,7 @@ public class WoopraIdentify implements Runnable{
                     .put("timeout", tracker.getIdleTimeout());
 
             // Add visitors properties
-            for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
+            for (Map.Entry<String, Object> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
                 postBody.put("cv_" + entry.getKey(), entry.getValue());
             }
 

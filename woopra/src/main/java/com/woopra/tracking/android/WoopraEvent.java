@@ -30,10 +30,10 @@ import java.util.Map;
  * @author Woopra on 1/26/2013
  *
  */
-public class WoopraEvent implements Runnable{
+public class WoopraEvent implements Runnable {
 
 	private WoopraTracker tracker;
-	private final Map<String, String> properties = new ConcurrentHashMap<String, String>();
+	private final Map<String, Object> properties = new ConcurrentHashMap<>();
 	private String eventName;
 	private long timestamp = -1;
 
@@ -48,7 +48,7 @@ public class WoopraEvent implements Runnable{
 	 * @param eventName
 	 * @param properties
 	 */
-	public WoopraEvent(String eventName, Map<String, String> properties) {
+	public WoopraEvent(String eventName, Map<String, Object> properties) {
 		this.eventName = eventName;
 		if (properties != null) {
 			this.properties.putAll(properties);
@@ -60,7 +60,7 @@ public class WoopraEvent implements Runnable{
 	 * @param tracker
 	 */
 	public void setTracker(WoopraTracker tracker){
-		this.tracker=tracker;
+		this.tracker = tracker;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class WoopraEvent implements Runnable{
 	/**
 	 * @return
 	 */
-	public Map<String, String> getProperties() {
+	public Map<String, Object> getProperties() {
 		return properties;
 	}
 
@@ -95,14 +95,14 @@ public class WoopraEvent implements Runnable{
 	 * @param newProperties
 	 */
 	@Deprecated
-	public void setEventProperty(Map<String, String> newProperties) {
+	public void setEventProperty(Map<String, Object> newProperties) {
 		properties.putAll(newProperties);
 	}
 
 	/**
 	 * @param newProperties
 	 */
-	public void setProperties(Map<String, String> newProperties) {
+	public void setProperties(Map<String, Object> newProperties) {
 		properties.putAll(newProperties);
 	}
 
@@ -111,7 +111,7 @@ public class WoopraEvent implements Runnable{
 	 * @param value
 	 */
 	@Deprecated
-	public void setEventProperty(String key, String value) {
+	public void setEventProperty(String key, Object value) {
 		properties.put(key, value);
 	}
 
@@ -119,7 +119,7 @@ public class WoopraEvent implements Runnable{
 	 * @param key
 	 * @param value
 	 */
-	public void setProperty(String key, String value) {
+	public void setProperty(String key, Object value) {
 		properties.put(key, value);
 	}
 
@@ -198,13 +198,13 @@ public class WoopraEvent implements Runnable{
             }
 
             // Add visitors properties
-            for (Map.Entry<String, String> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
+            for (Map.Entry<String, Object> entry : tracker.getWoopraContext().getVisitor().getProperties().entrySet()) {
                 postBody.put("cv_" + entry.getKey(), entry.getValue());
             }
 
             postBody.put("event", getName());
             // Add Event properties
-            for (Map.Entry<String, String> entry : getProperties().entrySet()) {
+            for (Map.Entry<String, Object> entry : getProperties().entrySet()) {
                 postBody.put("ce_" + entry.getKey(), entry.getValue());
             }
             Log.d(WoopraEvent.class.getName(), "Track event: " + getName());
