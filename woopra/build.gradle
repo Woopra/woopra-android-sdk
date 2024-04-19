@@ -8,7 +8,7 @@ android {
         minSdk 21
         targetSdk 34
         versionCode 1
-        versionName "1.1.0"
+        versionName version
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,9 +25,25 @@ android {
     }
 }
 
+subprojects {
+    sonarqube {
+        properties {
+            property "sonar.sources", "src"
+        }
+    }
+}
+
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
     testImplementation 'junit:junit:4.13.2'
 }
+
+ext {
+    artifactId = 'woopra-android'
+}
+
+description = 'Android SDK for Woopra'
+
+apply from: "$rootProject.projectDir/publish.gradle"

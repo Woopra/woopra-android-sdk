@@ -1,5 +1,23 @@
 ## Woopra Android SDK
 
+## Installation
+To declare the mavenCentral() repository. Add mavenCentral() in the project-level build.gradle or
+in the app module's build.gradle.
+``` gradle
+allprojects {
+    repositories {
+        ...
+        mavenCentral()
+        ...
+    }
+}
+```
+
+Add dependencies to app/build.gradle
+``` gradle
+implementation 'com.appier:woopra-android:1.1.0
+```
+
 ## Instantiate Tracker Object
 To setup your tracker SDK, configure the tracker instance as follows (replace `mybusiness.com` with your domain name):
 
@@ -77,7 +95,7 @@ tracker.trackEvent(event)
 ```
 
 ## Identifying
-You can send an identify call without tracking an event by using the `tracker.push()` method: 
+You can send an identify call without tracking an event by using the `tracker.push()` method:
 
 ``` java
 // Java

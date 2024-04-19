@@ -1,0 +1,50 @@
+buildscript {
+    // Getting properties from 'local.properties' or environment variables.
+    // This is intended for retrieving personal attributes like app ID,
+    // API Key, or credentials (secret variables) during CI/CD process.
+    //
+    // The 'key' will be expanded to dot-style property name and
+    // underscore-style environment name. For example, 'api.key' will be
+    // expanded to 'api.key' and 'API_KEY'. And 'API_KEY' will be expanded
+    // to 'API_KEY' and 'api.key' vise versa.
+    //
+    // Similar concept can be found in golang's viper:
+    // https://github.com/spf13/viper#working-with-environment-variables
+    ext.getLocalPropertyOrEnv = { key, defaultValue = '' ->
+        def keyWithUnderscoreStyle = key.toUpperCase().replaceAll('\\.', '_')
+        def keyWithDotStyle = key.toLowerCase().replaceAll('_', '.')
+        def keys = [key, keyWithUnderscoreStyle, keyWithDotStyle].unique()
+        Properties props = new Properties()
+        // get local.properties
+        def file = rootProject.file('local.properties')
+        if (file.exists()) {
+            props.load(file.newDataInputStream())
+        }
+        for (alt in keys) {
+            def value = props.getProperty(alt)
+            if (value != null) {
+                return value
+            }
+            value = System.getenv(alt)
+            if (value != null) {
+                return value
+            }
+        }
+        // get gradle.properties
+        file = rootProject.file('gradle.properties')
+        if (file.exists()) {
+            props.load(file.newDataInputStream())
+        }
+        for (alt in keys) {
+            def value = props.getProperty(alt)
+            if (value != null) {
+                return value
+            }
+            value = System.getenv(alt)
+            if (value != null) {
+                return value
+            }
+        }
+        return defaultValue
+    }
+}
