@@ -131,7 +131,7 @@ tracker.idleTimeout = 180
 ```
 
 > [!NOTE]
-> The idle timeout is in second.
+> The idle timeout is in seconds.
 
 ### Event Settings
 
