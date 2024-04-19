@@ -12,13 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package com.woopra.tracking.android;
+ */
+package com.woopra.tracking.android;
 
 import android.util.Log;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
