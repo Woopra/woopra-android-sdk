@@ -32,10 +32,8 @@ public class WoopraTracker {
 
 	private final Woopra woopraContext;
 	private final String domain;
-	private ScheduledExecutorService pingScheduler;
 	// default timeout value for Woopra service
 	private long idleTimeoutMs = 30000;
-	private boolean pingEnabled = false;
 
 	//
 	private String referer = null, deviceType=null;
@@ -100,47 +98,6 @@ public class WoopraTracker {
 	 */
 	public void setIdleTimeout(long idleTimeout) {
 		this.idleTimeoutMs = idleTimeout * 1000L;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isPingEnabled() {
-		return pingEnabled;
-	}
-
-	/**
-	 *
-	 * @param enabled
-	 */
-	public void setPingEnabled(boolean enabled) {
-		this.pingEnabled = enabled;
-		if (enabled) {
-			if (pingScheduler == null) {
-				long interval = idleTimeoutMs - 5000L;
-				if (interval < 0) {
-					interval /= 2;
-				}
-				pingScheduler = Executors.newScheduledThreadPool(1);
-				pingScheduler.scheduleAtFixedRate(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						new WoopraPing(WoopraTracker.this).run();
-					} catch (Throwable t) {
-						Log.e(WoopraTracker.class.getName(), "unknown ping error", t);
-					}
-				}
-
-				}, interval, interval, TimeUnit.MILLISECONDS);
-			}
-		} else {
-			if (pingScheduler != null) {
-				pingScheduler.shutdown();
-				pingScheduler = null;
-			}
-		}
 	}
 
 	/**
