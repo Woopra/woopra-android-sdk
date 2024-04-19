@@ -13,7 +13,6 @@ WoopraTracker tracker = Woopra.getInstance(this /* context (e.g. activity) */).g
 val tracker = Woopra.getInstance(this /* context (e.g. activity) */).getTracker("mybusiness.com")
 ```
 
-
 To add custom visitor properties, you should edit the visitor object:
 
 ``` java
@@ -97,7 +96,6 @@ To add referrer information, timestamp, and other track request properties, look
 
 ### Tracker Settings
 
-<<<<<<< HEAD
 #### Track Referrer
 
 ``` java
