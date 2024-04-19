@@ -1,7 +1,7 @@
 ## Woopra Android SDK
 
 ## Instantiate Tracker Object
-To setup your tracker SDK, configure the tracker instance as follows (replace mybusiness.com with your website):
+To setup your tracker SDK, configure the tracker instance as follows (replace `mybusiness.com` with your domain name):
 
 ``` java
 // Java
@@ -88,12 +88,12 @@ tracker.push();
 tracker.setVisitorProperty("name", "User Name")
 tracker.setVisitorProperty("email", "user@company.com")
 // Visitor data has not been sent to Woopra
-tracker.push();
+tracker.push()
 // Visitor data has been sent to Woopra, but no event has been tracked
 ```
 
 ## Advanced Settings
-To add referrer information, timestamp, and other track request properties, look at the WoopraTracker and WoopraEvent class public methods for an exhaustive list of setter methods.  Here are some common examples:
+To add referrer information, timestamp, and other track request properties, look at the `WoopraTracker` and `WoopraEvent` class public methods for an exhaustive list of setter methods.  Here are some common examples:
 
 ### Tracker Settings
 
@@ -102,11 +102,15 @@ To add referrer information, timestamp, and other track request properties, look
 ``` java
 // Java
 tracker.setReferer(<REFERRER_STRING>);
+// Or
+tracker.setReferrer(<REFERRER_STRING>);
 ```
 
 ``` kotlin
 // Kotlin
 tracker.referer = <REFERRER_STRING>
+// Or
+tracker.referrer = <REFERRER_STRING>
 ```
 
 > [!NOTE]
@@ -130,7 +134,8 @@ tracker.idleTimeout = 180
 > The idle timeout is in second.
 
 ### Event Settings
-Explicitly Set Timestamp:
+
+You can explicitly set a timestamp for an event:
 
 ``` java
 // Java
@@ -144,8 +149,6 @@ event.timestamp = <LONG_UNIX_MS_TIMESTAMP>
 
 > [!NOTE]
 > The unix epoch time is in milliseconds.
-
-
 
 ## License
 
