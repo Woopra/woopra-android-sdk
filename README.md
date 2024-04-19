@@ -19,29 +19,33 @@ To add custom visitor properties, you should edit the visitor object:
 // Java
 tracker.setVisitorProperty("name", "User Name");
 tracker.setVisitorProperty("email", "user@company.com");
+tracker.setVisitorProperty("age", 30);
 ```
 
 ``` kotlin
 // Kotlin
 tracker.setVisitorProperty("name", "User Name")
 tracker.setVisitorProperty("email", "user@company.com")
+tracker.setVisitorProperty("age", 30)
 ```
 
 Or,
 
 ``` java
 // Java
-Map<String,String> visitorProps = new HashMap<String,String>();
+Map<String, Object> visitorProps = new HashMap<>();
 visitorProps.put("name", "User Name");
 visitorProps.put("email", "user@company.com");
+visitorProps.put("age", 30);
 tracker.setVisitorProperties(visitorProps);
 ```
 
 ``` kotlin
 // Kotlin
-val visitorProps: MutableMap<String, String> = HashMap()
+val visitorProps: MutableMap<String, Any> = HashMap()
 visitorProps["name"] = "User Name"
 visitorProps["email"] = "user@company.com"
+visitorProps["age"] = 30
 tracker.setVisitorProperties(visitorProps)
 ```
 
@@ -51,9 +55,10 @@ To track an event, you must setup a `WoopraEvent` object and track it:
 ``` java
 // Java
 // setup event
-WoopraEvent event = new WoopraEvent("appview");
+WoopraEvent event = new WoopraEvent("app_viewed");
 event.setProperty("view", "home screen");
 event.setProperty("title", "Home Screen");
+event.setProperty("property_boolean", true);
 
 // track event
 tracker.trackEvent(event);
@@ -62,9 +67,10 @@ tracker.trackEvent(event);
 ``` kotlin
 // Kotlin
 // setup event
-val event = WoopraEvent("appview")
+val event = WoopraEvent("app_viewed")
 event.setProperty("view", "home screen")
 event.setProperty("title", "Home Screen")
+event.setProperty("property_boolean", true)
 
 // track event
 tracker.trackEvent(event)
@@ -77,6 +83,7 @@ You can send an identify call without tracking an event by using the `tracker.pu
 // Java
 tracker.setVisitorProperty("name", "User Name");
 tracker.setVisitorProperty("email", "user@company.com");
+tracker.setVisitorProperty("age", 30);
 // Visitor data has not been sent to Woopra
 tracker.push();
 // Visitor data has been sent to Woopra, but no event has been tracked
@@ -86,6 +93,7 @@ tracker.push();
 // Kotlin
 tracker.setVisitorProperty("name", "User Name")
 tracker.setVisitorProperty("email", "user@company.com")
+tracker.setVisitorProperty("age", 30)
 // Visitor data has not been sent to Woopra
 tracker.push()
 // Visitor data has been sent to Woopra, but no event has been tracked
