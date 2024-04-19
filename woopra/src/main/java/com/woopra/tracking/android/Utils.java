@@ -10,12 +10,12 @@ import java.util.UUID;
 public class Utils {
     /**
      *
-     * @param fristKey
+     * @param firstKey
      * @param secondKey
      * @return
      */
-    public static String getUUID(String fristKey, String secondKey) {
-        long mostSigBits = fristKey.hashCode();
+    public static String getUUID(String firstKey, String secondKey) {
+        long mostSigBits = firstKey.hashCode();
         long leastSigBits = secondKey.hashCode();
         UUID generateUUID = new UUID(mostSigBits, leastSigBits);
         String result = generateUUID.toString();

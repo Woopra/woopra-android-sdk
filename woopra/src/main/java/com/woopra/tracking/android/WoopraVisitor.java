@@ -30,7 +30,7 @@ public class WoopraVisitor {
 
 
 	private String cookie;
-	private final Map<String, String> properties = new java.util.concurrent.ConcurrentHashMap<String, String>();
+	private final Map<String, Object> properties = new java.util.concurrent.ConcurrentHashMap<>();
 
 	private WoopraVisitor() {
 	}
@@ -107,7 +107,7 @@ public class WoopraVisitor {
 	 *
 	 * @return
 	 */
-	public Map<String,String> getProperties() {
+	public Map<String, Object> getProperties() {
 		return properties;
 	}
 
@@ -115,7 +115,7 @@ public class WoopraVisitor {
 	 *
 	 * @param newProperties
 	 */
-	public void setProperties(Map<String,String> newProperties) {
+	public void setProperties(Map<String, Object> newProperties) {
 		properties.putAll(newProperties);
 	}
 
@@ -124,7 +124,7 @@ public class WoopraVisitor {
 	 * @param key
 	 * @param value
 	 */
-	public void setProperty(String key, String value) {
+	public void setProperty(String key, Object value) {
 		properties.put(key, value);
 	}
 }

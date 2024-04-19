@@ -27,7 +27,7 @@ import android.util.Log;
  */
 public class WoopraTracker {
 
-	private final static ExecutorService executor = Executors.newFixedThreadPool(1);;
+	private final static ExecutorService executor = Executors.newFixedThreadPool(1);
 
 
 	private final Woopra woopraContext;
@@ -36,7 +36,8 @@ public class WoopraTracker {
 	private long idleTimeoutMs = 30000;
 
 	//
-	private String referer = null, deviceType=null;
+	private String referer = null;
+	private String deviceType = null;
 
 	/**
 	 *
@@ -45,7 +46,7 @@ public class WoopraTracker {
 	 */
 	public WoopraTracker(String domain, Woopra woopraContext) {
 		this.domain = domain;
-		this.woopraContext=woopraContext;
+		this.woopraContext = woopraContext;
 	}
 
 	/**
@@ -70,8 +71,8 @@ public class WoopraTracker {
 	/**
 	 *
 	 */
-	public boolean push(){
-		WoopraIdentify identify=new WoopraIdentify(this);
+	public boolean push() {
+		WoopraIdentify identify = new WoopraIdentify(this);
 		executor.submit(identify);
 		return true;
 	}
@@ -171,8 +172,8 @@ public class WoopraTracker {
 	 * @param key
 	 * @param value
 	 */
-	public void setVisitorProperty(String key, String value) {
-	  if (key!=null && value != null) {
+	public void setVisitorProperty(String key, Object value) {
+	  if (key != null && value != null) {
 		  woopraContext.getVisitor().setProperty(key, value);
 	  }
 	}
@@ -181,7 +182,7 @@ public class WoopraTracker {
 	 *
 	 * @param newProperties
 	 */
-	public synchronized void setVisitorProperties(Map<String,String> newProperties) {
+	public synchronized void setVisitorProperties(Map<String, Object> newProperties) {
 		woopraContext.getVisitor().setProperties(newProperties);
 	}
  
