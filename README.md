@@ -24,7 +24,7 @@ repositories {
 
 Then add dependencies to app/build.gradle
 ``` gradle
-implementation 'com.appier:woopra-android:1.1.0'
+implementation 'com.appier:woopra-android:1.1.1'
 ```
 
 ## Instantiate Tracker Object
