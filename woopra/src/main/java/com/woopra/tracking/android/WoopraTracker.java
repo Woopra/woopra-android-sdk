@@ -33,7 +33,7 @@ public class WoopraTracker {
 	private final Woopra woopraContext;
 	private final String domain;
 	// default timeout value for Woopra service
-	private long idleTimeoutMs = 30000;
+	private long idleTimeoutMs = 5 * 60 * 1000;
 
 	//
 	private String referer = null;

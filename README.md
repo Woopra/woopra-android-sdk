@@ -156,16 +156,16 @@ tracker.referrer = <REFERRER_STRING>
 
 #### Idle Timeout
 
-You can update your idle timeout (default: 30 seconds) by updating the timeout property in your Woopra tracker:
+You can update your idle timeout (default: 5 minutes) by updating the timeout property in your Woopra tracker:
 
 ``` java
 // Java
-tracker.setIdleTimeout(180);
+tracker.setIdleTimeout(360);
 ```
 
 ``` kotlin
 // Kotlin
-tracker.idleTimeout = 180
+tracker.idleTimeout = 360
 ```
 
 > [!NOTE]
