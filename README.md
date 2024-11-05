@@ -124,12 +124,12 @@ You can update your idle timeout (default: 5 minutes) by updating the timeout pr
 
 ``` java
 // Java
-tracker.setIdleTimeout(360);
+tracker.setIdleTimeout(300);
 ```
 
 ``` kotlin
 // Kotlin
-tracker.idleTimeout = 360
+tracker.idleTimeout = 300
 ```
 
 > [!NOTE]
