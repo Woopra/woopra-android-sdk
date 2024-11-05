@@ -85,7 +85,7 @@ tracker.setVisitorProperty("name", "John Smith")
 tracker.setVisitorProperty("email", "john@smith.com")
 ```
 
-You can then send an identify call without tracking an event by using the `tracker.push()` method
+You can then send an identify call without tracking an event by using the `tracker.push()` method:
 
 ``` java
 // Java
